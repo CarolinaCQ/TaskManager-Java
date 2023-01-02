@@ -13,16 +13,15 @@ import org.hibernate.annotations.Where;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static jakarta.persistence.FetchType.EAGER;
 import static jakarta.persistence.GenerationType.IDENTITY;
 
 @Entity
 @Setter
 @Getter
-@Table(name = "projects")
-@SQLDelete(sql = "UPDATE projects SET deleted = true WHERE id = ?")
+@Table(name = "users")
+@SQLDelete(sql = "UPDATE users SET deleted = true WHERE id = ?")
 @Where(clause = "deleted = false")
-public class Project {
+public class User {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
@@ -30,11 +29,12 @@ public class Project {
     private Long id;
 
     @NotNull
-    @Column(name = "title")
-    private String title;
+    @Column(name = "username")
+    private String username;
 
-    @Column(name = "description")
-    private String description;
+    @NotNull
+    @Column(name = "password")
+    private String password;
 
     @CreationTimestamp
     @Column(name = "creation_date")
@@ -47,12 +47,9 @@ public class Project {
     @Column(name = "deleted")
     private Boolean deleted;
 
-    @OneToMany(mappedBy = "project")
-    @JsonIgnoreProperties("project")
-    private List<Task> tasks;
+    private List<Role> roles;
 
-    @ManyToOne(fetch = EAGER)
-    @JsonIgnoreProperties("projects")
-    private User user;
-
+    @OneToMany(mappedBy = "user")
+    @JsonIgnoreProperties("user")
+    private List<Project> projects;
 }
