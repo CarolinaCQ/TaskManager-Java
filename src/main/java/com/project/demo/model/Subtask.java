@@ -21,7 +21,7 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 @Table(name = "subtasks")
 @SQLDelete(sql = "UPDATE subtasks SET deleted = true WHERE id = ?")
 @Where(clause = "deleted=false")
-public class Subtasks {
+public class Subtask {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
