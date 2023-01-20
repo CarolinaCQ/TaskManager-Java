@@ -1,8 +1,6 @@
 package com.project.demo.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
@@ -10,10 +8,12 @@ import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.Where;
 
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static jakarta.persistence.GenerationType.IDENTITY;
+import static javax.persistence.GenerationType.IDENTITY;
 
 @Entity
 @Setter
@@ -47,6 +47,10 @@ public class User {
     @Column(name = "deleted")
     private Boolean deleted;
 
+    @ElementCollection(targetClass = String.class)
+    @CollectionTable(name = "role",
+            joinColumns = @JoinColumn(name = "id"))
+    @Column(name = "roles")
     private List<Role> roles;
 
     @OneToMany(mappedBy = "user")

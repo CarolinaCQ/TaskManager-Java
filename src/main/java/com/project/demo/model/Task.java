@@ -1,8 +1,6 @@
 package com.project.demo.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
@@ -10,11 +8,12 @@ import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.Where;
 
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static jakarta.persistence.FetchType.EAGER;
-import static jakarta.persistence.GenerationType.IDENTITY;
+import static javax.persistence.GenerationType.IDENTITY;
 
 @Entity
 @Setter
@@ -54,16 +53,17 @@ public class Task {
     @Column(name = "deleted")
     private Boolean deleted;
 
-    @Column(name = "condition")
+    @ManyToOne
+    @JoinColumn(name = "condition_id")
+    @JsonIgnoreProperties("tasks")
     private Condition condition;
 
-    /*@OneToMany
-    @JoinTable(name = "subtasks",
-            joinColumns = @JoinColumn(name = "id"))
-    private List<Subtask> subtasks;*/
-
-    @ManyToOne(fetch = EAGER)
-    @JoinColumn(name = "id")
+    @ManyToOne
+    @JoinColumn(name = "project_id")
     @JsonIgnoreProperties("tasks")
     private Project project;
+
+    @OneToMany(mappedBy = "task")
+    @JsonIgnoreProperties("task")
+    private List<Subtask> subtasks;
 }
