@@ -10,6 +10,7 @@ import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -35,12 +36,12 @@ public class Task {
     @Column(name = "description")
     private String description;
 
-    @NotNull
     @Column(name = "duration")
-    private Double duration;
+    private Integer duration;
 
+    @NotNull
     @Column(name = "finish_date")
-    private LocalDateTime finishDate;
+    private LocalDate finishDate;
 
     @CreationTimestamp
     @Column(name = "creation_date")
