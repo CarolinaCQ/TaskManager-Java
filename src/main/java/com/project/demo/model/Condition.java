@@ -33,6 +33,9 @@ public class Condition {
     @Column(name = "description")
     private String description;
 
+    @Column(name="deleted")
+    private Boolean deleted;
+
     @OneToMany(mappedBy = "condition")
     @JsonIgnoreProperties("condition")
     private List<Task> tasks;
