@@ -30,4 +30,14 @@ public class HandlerException {
 
         return new ResponseEntity<>(message, HttpStatus.NOT_FOUND);
     }
+
+    @ExceptionHandler(value = {Forbidden.class})
+    protected ResponseEntity<Object> handleForbidden(Forbidden ex) {
+        MessageException message = new MessageException(
+                ex.getMessage(),
+                HttpStatus.FORBIDDEN.value(),
+                LocalDateTime.now());
+
+        return new ResponseEntity<>(message, HttpStatus.FORBIDDEN);
+    }
 }
