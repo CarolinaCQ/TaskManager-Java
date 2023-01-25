@@ -13,6 +13,7 @@ import java.util.Optional;
 public interface IProjectService {
 
     ProjectDto createProject(ProjectDto dto);
+    void addUser (Project project);
     ProjectDto updateProject(ProjectDto dto, Long id);
     Optional<Project> findById(Long id);
     ProjectDto getById(Long id);

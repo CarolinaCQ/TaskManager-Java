@@ -14,6 +14,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,7 +43,19 @@ public class ProjectService implements IProjectService {
     public ProjectDto createProject(ProjectDto dto) {
         Project project = repository.save(mapper.dtoToProject(dto));
         project.setDeleted(false);
+        addUser(project);
         return mapper.projectToDto(project);
+    }
+
+    @Override
+    @Transactional
+    public void addUser(Project project) {
+        String loggedUser = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByUsername(loggedUser).get();
+        project.setUser(user);
+
+        List<Project> projects = user.getProjects();
+        projects.add(project);
     }
 
     @Override
