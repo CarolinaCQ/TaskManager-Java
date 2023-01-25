@@ -18,6 +18,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.method.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -47,19 +48,16 @@ public class TaskService implements ITaskService {
     @Autowired
     private MessageSource message;
 
-    @Autowired
-    private IConditionService conditionService;
-
     @Override
     @Transactional
     public TaskGetDto createTask(TaskPostDto dto) {
-        Task task = repository.save(mapper.dtoToTask(dto));
-        Integer durationInDays = this.durationTask(task);
+        Task task = mapper.dtoToTask(dto);
+        Integer durationInDays = durationTask(task);
         task.setDuration(durationInDays);
-        task.setProject(projectRepository.findById(dto.getIdProject()).get());
-        relationshipCondition(task);
-        conditionService.relationshipTask(1L, task);
-        return mapper.taskToDto(task);
+        addProjectToTask(task, dto.getIdProject());
+        addConditionToTask(task, 1L);
+        Task savedTask = repository.save(task);
+        return mapper.taskToDto(savedTask);
     }
 
     private Integer durationTask (Task task){
@@ -71,9 +69,19 @@ public class TaskService implements ITaskService {
     }
 
     @Transactional
-    private void relationshipCondition(Task task) {
-        Condition condition = conditionRepository.findById(1L).get();
+    private void addProjectToTask(Task task, Long idProject){
+        Project project = projectRepository.findById(idProject).get();
+        task.setProject(project);
+
+        project.getTasks().add(task);
+    }
+
+    @Transactional
+    private void addConditionToTask(Task task, Long id) {
+        Condition condition = conditionRepository.findById(id).get();
         task.setCondition(condition);
+
+        condition.getTasks().add(task);
     }
 
     @Override

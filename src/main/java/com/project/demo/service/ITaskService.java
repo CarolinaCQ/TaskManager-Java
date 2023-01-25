@@ -13,6 +13,7 @@ import java.util.Optional;
 public interface ITaskService {
 
     TaskGetDto createTask(TaskPostDto dto);
+
     TaskGetDto updateTask(TaskPostDto dto, Long id);
     Optional<Task> findById(Long id);
     TaskGetDto getById(Long id);

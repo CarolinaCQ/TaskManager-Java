@@ -41,15 +41,15 @@ public class ProjectService implements IProjectService {
     @Override
     @Transactional
     public ProjectDto createProject(ProjectDto dto) {
-        Project project = repository.save(mapper.dtoToProject(dto));
+        Project project = mapper.dtoToProject(dto);
         project.setDeleted(false);
-        addUser(project);
-        return mapper.projectToDto(project);
+        addUserToProject(project);
+        Project savedProject = repository.save(project);
+        return mapper.projectToDto(savedProject);
     }
 
-    @Override
     @Transactional
-    public void addUser(Project project) {
+    private void addUserToProject(Project project) {
         String loggedUser = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userRepository.findByUsername(loggedUser).get();
         project.setUser(user);
