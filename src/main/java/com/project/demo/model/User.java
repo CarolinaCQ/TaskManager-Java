@@ -3,12 +3,13 @@ package com.project.demo.model;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.UpdateTimestamp;
-import org.hibernate.annotations.Where;
+import org.hibernate.annotations.*;
+import org.hibernate.validator.constraints.UniqueElements;
 
 import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -29,6 +30,7 @@ public class User {
     private Long id;
 
     @NotNull
+    @UniqueElements(message = "user.exists")
     @Column(name = "username")
     private String username;
 
@@ -47,10 +49,12 @@ public class User {
     @Column(name = "deleted")
     private Boolean deleted;
 
-    @ElementCollection(targetClass = String.class)
-    @CollectionTable(name = "role",
-            joinColumns = @JoinColumn(name = "id"))
-    @Column(name = "roles")
+    @ManyToMany(fetch =
+            FetchType.EAGER,
+            cascade = CascadeType.PERSIST)
+    @JoinTable(name = "user_role",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id"))
     private List<Role> roles;
 
     @OneToMany(mappedBy = "user")
