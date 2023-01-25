@@ -16,5 +16,4 @@ public interface IConditionService {
     ConditionDto getById (Long id);
     List<ConditionDto> getAllConditions ();
     void deleteCondition (Long id);
-    void relationshipTask(Long id, Task task);
 }

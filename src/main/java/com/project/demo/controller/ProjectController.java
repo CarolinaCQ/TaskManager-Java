@@ -25,8 +25,8 @@ public class ProjectController {
         return ResponseEntity.status(HttpStatus.OK).body(project);
     }
 
-    @GetMapping("/user/{id}")
-    public ResponseEntity<Map<String,Object>> pageProjects(@RequestParam Integer numberPage, @PathVariable Long id, Pageable pageable){
+    @GetMapping("/page")
+    public ResponseEntity<Map<String,Object>> pageProjects(@RequestParam Integer numberPage, @RequestParam Long id, Pageable pageable){
         Map<String,Object> projects = service.responseProjectPage(numberPage,pageable,id);
         return ResponseEntity.status(HttpStatus.OK).body(projects);
     }

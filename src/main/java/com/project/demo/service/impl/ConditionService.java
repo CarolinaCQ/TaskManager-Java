@@ -40,13 +40,6 @@ public class ConditionService implements IConditionService {
     }
 
     @Override
-    @Transactional
-    public void relationshipTask(Long id, Task task){
-        Condition condition = findById(id).get();
-        condition.getTasks().add(task);
-    }
-
-    @Override
     public ConditionDto updateCondition(ConditionDto dto, Long id) {
         if(!findById(id).isPresent()) throw new BadRequest(
                 message.getMessage("condition.notFound", null, Locale.US));

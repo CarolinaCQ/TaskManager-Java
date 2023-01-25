@@ -43,10 +43,19 @@ public class SubtaskService implements ISubtaskService {
     @Override
     @Transactional
     public SubtaskGetDto createSubtask(SubtaskPostDto dto) {
-        Subtask subtask = repository.save(mapper.dtoToSubtask(dto));
+        Subtask subtask = mapper.dtoToSubtask(dto);
         subtask.setDeleted(false);
-        subtask.setTask(taskRepository.findById(dto.getIdTask()).get());
-        return mapper.subtaskToDto(subtask);
+        addTaskToSubtasks(subtask, dto.getIdTask());
+        Subtask savedSubtask = repository.save(subtask);
+        return mapper.subtaskToDto(savedSubtask);
+    }
+
+    @Transactional
+    private void addTaskToSubtasks(Subtask subtask, Long idTask){
+        Task task = taskRepository.findById(idTask).get();
+        subtask.setTask(task);
+
+        task.getSubtasks().add(subtask);
     }
 
     @Override
