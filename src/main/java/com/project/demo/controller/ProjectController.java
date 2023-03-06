@@ -1,5 +1,6 @@
 package com.project.demo.controller;
 
+import com.project.demo.documentation.IProjectController;
 import com.project.demo.dto.ProjectDto;
 import com.project.demo.service.IProjectService;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +15,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("projects")
-public class ProjectController {
+public class ProjectController implements IProjectController {
 
     @Autowired
     private IProjectService service;

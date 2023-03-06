@@ -36,27 +36,8 @@ public class AppSecurity extends WebSecurityConfigurerAdapter {
         http
                 .authorizeRequests()
                 .antMatchers(AUTH).permitAll()
-                //.antMatchers("/v2/api-docs", "/swagger-resources/**", "/swagger-ui.html", "/webjars/**").permitAll()
-                .antMatchers(HttpMethod.POST, PROJECTS).hasAnyAuthority(ALL_ROLES)
-                .antMatchers(HttpMethod.PATCH, PROJECTS_ID).hasAnyAuthority(ALL_ROLES)
-                .antMatchers(HttpMethod.GET,PAGE_PROJECTS).hasAnyAuthority(ALL_ROLES)
-                .antMatchers(HttpMethod.GET, PROJECTS_ID).hasAnyAuthority(ALL_ROLES)
-                .antMatchers(HttpMethod.DELETE, PROJECTS_ID).hasAnyAuthority(ALL_ROLES)
-                .antMatchers(HttpMethod.POST, TASKS).hasAnyAuthority(ALL_ROLES)
-                .antMatchers(HttpMethod.PATCH, TASKS_ID).hasAnyAuthority(ALL_ROLES)
-                .antMatchers(HttpMethod.GET,PAGE_TASKS).hasAnyAuthority(ALL_ROLES)
-                .antMatchers(HttpMethod.GET, TASKS_ID).hasAnyAuthority(ALL_ROLES)
-                .antMatchers(HttpMethod.DELETE, TASKS_ID).hasAnyAuthority(ALL_ROLES)
-                .antMatchers(HttpMethod.POST, SUBTASKS).hasAnyAuthority(ALL_ROLES)
-                .antMatchers(HttpMethod.PATCH, SUBTASKS_ID).hasAnyAuthority(ALL_ROLES)
-                .antMatchers(HttpMethod.GET,PAGE_SUBTASKS).hasAnyAuthority(ALL_ROLES)
-                .antMatchers(HttpMethod.GET, SUBTASKS_ID).hasAnyAuthority(ALL_ROLES)
-                .antMatchers(HttpMethod.DELETE, SUBTASKS_ID).hasAnyAuthority(ALL_ROLES)
-                .antMatchers(HttpMethod.POST, USERS).hasAnyAuthority(ALL_ROLES)
-                .antMatchers(HttpMethod.PATCH, USERS_ID).hasAnyAuthority(ALL_ROLES)
+                .antMatchers(API_DOCUMENTATION).permitAll()
                 .antMatchers(HttpMethod.GET, USERS).hasAnyAuthority(ROLE_ADMIN)
-                .antMatchers(HttpMethod.GET, USERS_ID).hasAnyAuthority(ALL_ROLES)
-                .antMatchers(HttpMethod.DELETE, USERS_ID).hasAnyAuthority(ALL_ROLES)
                 .anyRequest().authenticated();
         http.addFilter(customAuthenticationFilter);
         http.addFilterBefore(new CustomAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);

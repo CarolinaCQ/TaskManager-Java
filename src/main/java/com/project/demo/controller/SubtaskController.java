@@ -1,5 +1,6 @@
 package com.project.demo.controller;
 
+import com.project.demo.documentation.ISubtaskController;
 import com.project.demo.dto.SubtaskGetDto;
 import com.project.demo.dto.SubtaskPostDto;
 import com.project.demo.service.ISubtaskService;
@@ -14,7 +15,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("subtasks")
-public class SubtaskController {
+public class SubtaskController implements ISubtaskController {
 
     @Autowired
     private ISubtaskService service;
