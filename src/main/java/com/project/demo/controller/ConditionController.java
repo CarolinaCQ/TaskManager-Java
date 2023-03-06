@@ -1,5 +1,6 @@
 package com.project.demo.controller;
 
+import com.project.demo.documentation.IConditionController;
 import com.project.demo.dto.ConditionDto;
 import com.project.demo.service.IConditionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +13,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("tasks/conditions")
-public class ConditionController {
+public class ConditionController implements IConditionController {
 
     @Autowired
     private IConditionService service;

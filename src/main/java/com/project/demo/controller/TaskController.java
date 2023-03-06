@@ -1,5 +1,6 @@
 package com.project.demo.controller;
 
+import com.project.demo.documentation.ITaskController;
 import com.project.demo.dto.TaskGetDto;
 import com.project.demo.dto.TaskPostDto;
 import com.project.demo.service.ITaskService;
@@ -14,7 +15,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("tasks")
-public class TaskController {
+public class TaskController implements ITaskController {
 
     @Autowired
     private ITaskService service;
