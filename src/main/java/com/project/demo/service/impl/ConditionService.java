@@ -35,7 +35,6 @@ public class ConditionService implements IConditionService {
     @Transactional
     public ConditionDto createCondition(ConditionDto dto) {
         Condition condition = repository.save(mapper.dtoToCondition(dto));
-        condition.setDeleted(false);
         return mapper.conditionToDto(condition);
     }
 

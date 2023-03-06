@@ -52,7 +52,7 @@ public class Task {
     private LocalDateTime updateDate;
 
     @Column(name = "deleted")
-    private Boolean deleted;
+    private Boolean deleted = Boolean.FALSE;
 
     @ManyToOne
     @JoinColumn(name = "condition_id")

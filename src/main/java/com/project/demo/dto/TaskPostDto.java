@@ -17,6 +17,5 @@ public class TaskPostDto {
     private String description;
     private LocalDate finishDate;
     private Long idProject;
-    private Boolean deleted = false;
 
 }

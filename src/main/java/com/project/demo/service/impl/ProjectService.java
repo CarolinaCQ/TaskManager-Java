@@ -42,7 +42,6 @@ public class ProjectService implements IProjectService {
     @Transactional
     public ProjectDto createProject(ProjectDto dto) {
         Project project = mapper.dtoToProject(dto);
-        project.setDeleted(false);
         addUserToProject(project);
         Project savedProject = repository.save(project);
         return mapper.projectToDto(savedProject);

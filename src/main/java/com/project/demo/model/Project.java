@@ -45,7 +45,7 @@ public class Project {
     private LocalDateTime updateDate;
 
     @Column(name = "deleted")
-    private Boolean deleted;
+    private Boolean deleted = Boolean.FALSE;
 
     @OneToMany(mappedBy = "project")
     @JsonIgnoreProperties("project")

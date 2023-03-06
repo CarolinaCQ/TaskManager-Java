@@ -33,7 +33,7 @@ public class Role {
     private String description;
 
     @Column(name="deleted")
-    private Boolean deleted;
+    private Boolean deleted = Boolean.FALSE;
 
     @ManyToMany(mappedBy = "roles", fetch = FetchType.LAZY)
     private List<User> users;

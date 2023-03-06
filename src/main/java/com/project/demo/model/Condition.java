@@ -34,7 +34,7 @@ public class Condition {
     private String description;
 
     @Column(name="deleted")
-    private Boolean deleted;
+    private Boolean deleted = Boolean.FALSE;
 
     @OneToMany(mappedBy = "condition")
     @JsonIgnoreProperties("condition")

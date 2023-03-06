@@ -51,7 +51,6 @@ public class UserService implements IUserService, UserDetailsService {
                 message.getMessage("user.exists", null, Locale.US));
         User user = mapper.dtoToUser(dto);
         user.setPassword(encoder.encode(dto.getPassword()));
-        user.setDeleted(false);
         User savedUser = repository.save(user);
         addRoleToUser(ROLE_USER, savedUser);
         return mapper.userToDto(savedUser);
@@ -62,7 +61,6 @@ public class UserService implements IUserService, UserDetailsService {
     public UserGetDto loadUserData(UserPostDto dto) {
         User user = mapper.dtoToUser(dto);
         user.setPassword(encoder.encode(dto.getPassword()));
-        user.setDeleted(false);
         User savedUser = repository.save(user);
         addRoleToUser(ROLE_ADMIN, savedUser);
         return mapper.userToDto(savedUser);

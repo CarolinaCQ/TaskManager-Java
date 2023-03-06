@@ -49,7 +49,7 @@ public class User {
     private LocalDateTime updateDate;
 
     @Column(name = "deleted")
-    private Boolean deleted;
+    private Boolean deleted = Boolean.FALSE;
 
     @ManyToMany(fetch =
             FetchType.EAGER,

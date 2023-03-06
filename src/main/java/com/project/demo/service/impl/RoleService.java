@@ -31,7 +31,6 @@ public class RoleService implements IRoleService {
     @Transactional
     public RoleDto createRole(RoleDto dto) {
         Role role = mapper.dtoToRole(dto);
-        role.setDeleted(false);
         Role savedRole = repository.save(role);
         return mapper.roleToDto(savedRole);
     }
