@@ -12,8 +12,8 @@ public interface IConditionService {
 
     ConditionDto createCondition (ConditionDto dto);
     ConditionDto updateCondition (ConditionDto dto, Long id);
-    Optional<Condition> findById (Long id);
-    ConditionDto getById (Long id);
+    Condition getById (Long id);
+    ConditionDto getConditionById (Long id);
     List<ConditionDto> getAllConditions ();
     void deleteCondition (Long id);
 }

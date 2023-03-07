@@ -40,23 +40,20 @@ public class ConditionService implements IConditionService {
 
     @Override
     public ConditionDto updateCondition(ConditionDto dto, Long id) {
-        if(!findById(id).isPresent()) throw new BadRequest(
-                message.getMessage("condition.notFound", null, Locale.US));
-        Condition condition = repository.save(mapper.updateConditionFromDto(dto, findById(id).get()));
-        return mapper.conditionToDto(condition);
+        Condition condition = getById(id);
+        Condition savedCondition = repository.save(mapper.updateConditionFromDto(dto, condition));
+        return mapper.conditionToDto(savedCondition);
     }
 
     @Override
-    public Optional<Condition> findById(Long id) {
-        return repository.findById(id);
+    public Condition getById (Long id) {
+        return repository.findById(id).orElseThrow(() -> new BadRequest(
+                message.getMessage("condition.notFound", null, Locale.US)));
     }
 
     @Override
-    public ConditionDto getById(Long id) {
-        if(!findById(id).isPresent()) throw new BadRequest(
-                message.getMessage("condition.notFound", null, Locale.US));
-        Condition condition = findById(id).get();
-        return mapper.conditionToDto(condition);
+    public ConditionDto getConditionById(Long id) {
+        return mapper.conditionToDto(getById(id));
     }
 
     @Override
@@ -67,8 +64,7 @@ public class ConditionService implements IConditionService {
 
     @Override
     public void deleteCondition(Long id) {
-        if(!findById(id).isPresent()) throw new BadRequest(
-                message.getMessage("condition.notFound", null, Locale.US));
+        Condition condition = getById(id);
         repository.deleteById(id);
     }
 }
