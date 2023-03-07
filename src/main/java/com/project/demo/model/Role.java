@@ -36,7 +36,7 @@ public class Role implements GrantedAuthority {
     @Column(name="deleted")
     private Boolean deleted = Boolean.FALSE;
 
-    @ManyToMany(mappedBy = "roles", fetch = FetchType.LAZY)
+    @ManyToMany(mappedBy = "roles", fetch = FetchType.EAGER)
     private List<User> users;
 
     @Override

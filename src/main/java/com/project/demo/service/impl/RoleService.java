@@ -38,36 +38,32 @@ public class RoleService implements IRoleService {
     @Override
     public void loadRoleData(RoleDto dto) {
         Role role = mapper.dtoToRole(dto);
-        role.setDeleted(false);
         repository.save(role);
     }
 
     @Override
     @Transactional
     public RoleDto updateRole(RoleDto dto, Long id) {
-        if(!findById(id).isPresent()) throw new BadRequest(
-                message.getMessage("role.notFound", null, Locale.US));
-        Role role = mapper.updateRoleFromDto(dto, findById(id).get());
-        return mapper.roleToDto(role);
+        Role role = getById(id);
+        Role savedRole = mapper.updateRoleFromDto(dto, role);
+        return mapper.roleToDto(savedRole);
     }
 
     @Override
-    public Optional<Role> findById(Long id) {
-        return repository.findById(id);
+    public Role getById(Long id) {
+        return repository.findById(id).orElseThrow(() -> new BadRequest(
+                message.getMessage("role.notFound", null, Locale.US)));
     }
 
     @Override
-    public RoleDto getById(Long id) {
-        if(!findById(id).isPresent()) throw new BadRequest(
-                message.getMessage("role.notFound", null, Locale.US));
-        Role role = findById(id).get();
+    public RoleDto getRoleById(Long id) {
+        Role role = getById(id);
         return mapper.roleToDto(role);
     }
 
     @Override
     public void deleteRole(Long id) {
-        if(!findById(id).isPresent()) throw new BadRequest(
-                message.getMessage("role.notFound", null, Locale.US));
+        Role role = getById(id);
         repository.deleteById(id);
     }
 

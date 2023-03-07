@@ -17,6 +17,8 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
+import static javax.persistence.CascadeType.PERSIST;
+import static javax.persistence.FetchType.EAGER;
 import static javax.persistence.GenerationType.IDENTITY;
 
 @Entity
@@ -53,14 +55,14 @@ public class User implements UserDetails{
     private Boolean deleted = Boolean.FALSE;
 
     @ManyToMany(fetch =
-            FetchType.EAGER,
-            cascade = CascadeType.PERSIST)
+            EAGER,
+            cascade = PERSIST)
     @JoinTable(name = "user_role",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     private List<Role> roles;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", fetch = EAGER)
     @JsonIgnoreProperties("user")
     private List<Project> projects;
 

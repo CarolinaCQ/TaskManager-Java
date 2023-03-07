@@ -13,8 +13,8 @@ public interface IRoleService {
     RoleDto createRole (RoleDto dto);
     void loadRoleData(RoleDto dto);
     RoleDto updateRole (RoleDto dto, Long id);
-    Optional<Role> findById (Long id);
-    RoleDto getById (Long id);
+    Role getById (Long id);
+    RoleDto getRoleById (Long id);
     void deleteRole (Long id);
     List<RoleDto> getAllRoles();
 }
