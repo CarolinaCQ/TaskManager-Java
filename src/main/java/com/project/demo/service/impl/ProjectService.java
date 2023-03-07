@@ -45,6 +45,8 @@ public class ProjectService implements IProjectService {
         Project project = mapper.dtoToProject(dto);
         project.setUser(loggedUser);
         loggedUser.getProjects().add(project);
+        if(!loggedUser.getUsername().equals(project.getUser().getUsername()))
+            throw new Forbidden(message.getMessage("access", null, Locale.US));
         Project savedProject = repository.save(project);
         return mapper.projectToDto(savedProject);
     }
