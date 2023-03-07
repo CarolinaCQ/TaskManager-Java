@@ -20,7 +20,7 @@ public class ConditionController implements IConditionController {
 
     @GetMapping("/{id}")
     public ResponseEntity<ConditionDto> geConditionyId(@PathVariable Long id){
-        ConditionDto condition = service.getById(id);
+        ConditionDto condition = service.getConditionById(id);
         return ResponseEntity.status(HttpStatus.OK).body(condition);
     }
 
