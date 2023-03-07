@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
+import org.springframework.security.core.GrantedAuthority;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -19,7 +20,7 @@ import static javax.persistence.GenerationType.IDENTITY;
 @Table(name = "roles")
 @SQLDelete(sql = "UPDATE roles SET deleted = true WHERE id = ?")
 @Where(clause = "deleted = false")
-public class Role {
+public class Role implements GrantedAuthority {
     @Id
     @GeneratedValue(strategy = IDENTITY)
     @Column(name = "id")
@@ -37,4 +38,9 @@ public class Role {
 
     @ManyToMany(mappedBy = "roles", fetch = FetchType.LAZY)
     private List<User> users;
+
+    @Override
+    public String getAuthority() {
+        return name;
+    }
 }

@@ -3,7 +3,7 @@ package com.project.demo.security;
 import com.project.demo.filter.CustomAuthenticationFilter;
 import com.project.demo.filter.CustomAuthorizationFilter;
 import com.project.demo.service.impl.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -22,10 +22,10 @@ import static com.project.demo.util.Contants.Roles.*;
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class AppSecurity extends WebSecurityConfigurerAdapter {
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
