@@ -3,22 +3,23 @@ package com.project.demo.service.impl;
 import com.project.demo.dto.TaskGetDto;
 import com.project.demo.dto.TaskPostDto;
 import com.project.demo.exception.BadRequest;
+import com.project.demo.exception.Forbidden;
 import com.project.demo.exception.NotFound;
 import com.project.demo.mapper.TaskMapper;
 import com.project.demo.model.Condition;
 import com.project.demo.model.Project;
 import com.project.demo.model.Task;
-import com.project.demo.repository.ConditionRepository;
-import com.project.demo.repository.ProjectRepository;
+import com.project.demo.model.User;
 import com.project.demo.repository.TaskRepository;
 import com.project.demo.service.IConditionService;
+import com.project.demo.service.IProjectService;
 import com.project.demo.service.ITaskService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.access.method.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,36 +27,37 @@ import java.net.URI;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static com.project.demo.util.Contants.Page.*;
 
 @Service
+@RequiredArgsConstructor
 public class TaskService implements ITaskService {
 
-    @Autowired
-    private TaskRepository repository;
-
-    @Autowired
-    private ConditionRepository conditionRepository;
-
-    @Autowired
-    private ProjectRepository projectRepository;
-
-    @Autowired
-    private TaskMapper mapper;
-
-    @Autowired
-    private MessageSource message;
+    private final TaskRepository repository;
+    private final IConditionService conditionService;
+    private final IProjectService projectService;
+    private final TaskMapper mapper;
+    private final MessageSource message;
 
     @Override
     @Transactional
-    public TaskGetDto createTask(TaskPostDto dto) {
+    public TaskGetDto createTask(TaskPostDto dto, User loggedUser) {
+
         Task task = mapper.dtoToTask(dto);
-        Integer durationInDays = durationTask(task);
-        task.setDuration(durationInDays);
-        addProjectToTask(task, dto.getIdProject());
-        addConditionToTask(task, 1L);
+        task.setDuration(durationTask(task));
+
+        Project project= projectService.getById(dto.getIdProject());
+        task.setProject(project);
+        project.getTasks().add(task);
+
+        Condition condition = conditionService.getById(1L);
+        task.setCondition(condition);
+        condition.getTasks().add(task);
+
+        if(!loggedUser.getUsername().equals(project.getUser().getUsername()))
+            throw new Forbidden(message.getMessage("access", null, Locale.US));
+
         Task savedTask = repository.save(task);
         return mapper.taskToDto(savedTask);
     }
@@ -68,69 +70,44 @@ public class TaskService implements ITaskService {
         return durationInDays;
     }
 
+    @Override
     @Transactional
-    private void addProjectToTask(Task task, Long idProject){
-        Project project = projectRepository.findById(idProject).get();
-        task.setProject(project);
-
-        project.getTasks().add(task);
-    }
-
-    @Transactional
-    private void addConditionToTask(Task task, Long id) {
-        Condition condition = conditionRepository.findById(id).get();
-        task.setCondition(condition);
-
-        condition.getTasks().add(task);
+    public TaskGetDto updateTask(TaskPostDto dto, Long id, User loggedUser) {
+        Task task = getById(id);
+        Task savedTask = repository.save(mapper.updateTaskFromDto(dto, task));
+        savedTask.setDuration(durationTask(task));
+        return mapper.taskToDto(savedTask);
     }
 
     @Override
-    @Transactional
-    public TaskGetDto updateTask(TaskPostDto dto, Long id) {
-        if(!findById(id).isPresent()) throw new BadRequest(
-                message.getMessage("task.notFound", null, Locale.US));
-        Task task = repository.save(mapper.updateTaskFromDto(dto, findById(id).get()));
-        Integer durationInDays = this.durationTask(task);
-        task.setDuration(durationInDays);
-        return mapper.taskToDto(task);
+    public Task getById(Long id) {
+        return repository.findById(id).orElseThrow(() -> new BadRequest(
+                message.getMessage("task.notFound", null, Locale.US)));
     }
 
     @Override
-    public Optional<Task> findById(Long id) {
-        return repository.findById(id);
-    }
-
-    @Override
-    public TaskGetDto getById(Long id) {
-        if(!findById(id).isPresent()) throw new BadRequest(
-                message.getMessage("task.notFound", null, Locale.US));
-        Task task = repository.findById(id).get();
-        return mapper.taskToDto(task);
+    public TaskGetDto getTaskById(Long id) {
+        return mapper.taskToDto(getById(id));
     }
 
     @Override
     public List<TaskGetDto> getAllTasksByProjectId(Long projectId) {
-        Project project = projectRepository.findById(projectId).get();
-        if(Objects.isNull(project)) throw new BadRequest(
-                message.getMessage("project.notFound", null, Locale.US));
+        Project project = projectService.getById(projectId);
         List<Task> tasks = project.getTasks();
         return mapper.tasksToDtos(tasks);
     }
 
     @Override
     public List<TaskGetDto> getAllTasksByConditionId(Long conditionId) {
-        Condition condition = conditionRepository.findById(conditionId).get();
-        if(Objects.isNull(condition)) throw new BadRequest(
-                message.getMessage("project.notFound", null, Locale.US));
+        Condition condition = conditionService.getById(conditionId);
         List<Task> tasks = condition.getTasks();
         return mapper.tasksToDtos(tasks);
     }
 
     @Override
     @Transactional
-    public void deleteTask(Long id) {
-        if(!findById(id).isPresent()) throw new BadRequest(
-                message.getMessage("task.notFound", null, Locale.US));
+    public void deleteTask(Long id, User loggedUser) {
+        Task task = getById(id);
         repository.deleteById(id);
     }
 

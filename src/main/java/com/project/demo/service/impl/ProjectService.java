@@ -10,12 +10,11 @@ import com.project.demo.model.User;
 import com.project.demo.repository.ProjectRepository;
 import com.project.demo.repository.UserRepository;
 import com.project.demo.service.IProjectService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,19 +24,13 @@ import java.util.*;
 import static com.project.demo.util.Contants.Page.URI_PAGE_PROJECT;
 
 @Service
+@RequiredArgsConstructor
 public class ProjectService implements IProjectService {
 
-    @Autowired
-    private ProjectRepository repository;
-
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private ProjectMapper mapper;
-
-    @Autowired
-    private MessageSource message;
+    private final ProjectRepository repository;
+    private final UserRepository userRepository;
+    private final ProjectMapper mapper;
+    private final MessageSource message;
 
     @Override
     @Transactional

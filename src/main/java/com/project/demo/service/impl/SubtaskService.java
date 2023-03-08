@@ -2,19 +2,16 @@ package com.project.demo.service.impl;
 
 import com.project.demo.dto.SubtaskGetDto;
 import com.project.demo.dto.SubtaskPostDto;
-import com.project.demo.dto.TaskGetDto;
 import com.project.demo.exception.BadRequest;
 import com.project.demo.exception.Forbidden;
 import com.project.demo.exception.NotFound;
 import com.project.demo.mapper.SubtaskMapper;
-import com.project.demo.model.Condition;
 import com.project.demo.model.Subtask;
-import com.project.demo.model.Task;
 import com.project.demo.model.User;
 import com.project.demo.repository.SubtaskRepository;
 import com.project.demo.repository.TaskRepository;
 import com.project.demo.service.ISubtaskService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -28,19 +25,13 @@ import java.util.*;
 import static com.project.demo.util.Contants.Page.*;
 
 @Service
+@RequiredArgsConstructor
 public class SubtaskService implements ISubtaskService {
 
-    @Autowired
-    private SubtaskRepository repository;
-
-    @Autowired
-    private TaskRepository taskRepository;
-
-    @Autowired
-    private SubtaskMapper mapper;
-
-    @Autowired
-    private MessageSource message;
+    private final SubtaskRepository repository;
+    private final TaskRepository taskRepository;
+    private final SubtaskMapper mapper;
+    private final MessageSource message;
 
     @Override
     @Transactional

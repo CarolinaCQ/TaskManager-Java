@@ -6,26 +6,21 @@ import com.project.demo.mapper.RoleMapper;
 import com.project.demo.model.Role;
 import com.project.demo.repository.RoleRepository;
 import com.project.demo.service.IRoleService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Locale;
-import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class RoleService implements IRoleService {
 
-    @Autowired
-    private RoleRepository repository;
-
-    @Autowired
-    private RoleMapper mapper;
-
-    @Autowired
-    private MessageSource message;
+    private final RoleRepository repository;
+    private final RoleMapper mapper;
+    private final MessageSource message;
 
     @Override
     @Transactional
