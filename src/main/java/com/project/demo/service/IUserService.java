@@ -2,6 +2,7 @@ package com.project.demo.service;
 
 import com.project.demo.dto.UserGetDto;
 import com.project.demo.dto.UserPostDto;
+import com.project.demo.dto.UserPostUpdateDto;
 import com.project.demo.model.User;
 
 import java.util.List;
@@ -11,7 +12,7 @@ public interface IUserService {
 
     UserGetDto registerUser (UserPostDto dto);
     UserGetDto loadUserData (UserPostDto dto);
-    UserGetDto updateUser(UserPostDto dto, Long id, User loggedUser);
+    UserGetDto updateUser(UserPostUpdateDto dto, Long id, User loggedUser);
     User getById(Long id);
     UserGetDto getUserById(Long id);
     List<UserGetDto> getAllUsers();

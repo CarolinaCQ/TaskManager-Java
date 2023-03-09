@@ -2,6 +2,7 @@ package com.project.demo.controller;
 
 import com.project.demo.dto.UserGetDto;
 import com.project.demo.dto.UserPostDto;
+import com.project.demo.dto.UserPostUpdateDto;
 import com.project.demo.model.User;
 import com.project.demo.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +45,7 @@ public class AuthController {
     }
 
     @PatchMapping("users/{id}")
-    public ResponseEntity<UserGetDto> updateUser(@RequestBody @Valid UserPostDto dto, @PathVariable Long id, @AuthenticationPrincipal User loggedUser){
+    public ResponseEntity<UserGetDto> updateUser(@RequestBody @Valid UserPostUpdateDto dto, @PathVariable Long id, @AuthenticationPrincipal User loggedUser){
         UserGetDto user = service.updateUser(dto, id, loggedUser);
         return ResponseEntity.status(HttpStatus.OK).body(user);
     }

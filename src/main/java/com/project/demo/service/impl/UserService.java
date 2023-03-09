@@ -2,6 +2,7 @@ package com.project.demo.service.impl;
 
 import com.project.demo.dto.UserGetDto;
 import com.project.demo.dto.UserPostDto;
+import com.project.demo.dto.UserPostUpdateDto;
 import com.project.demo.exception.BadRequest;
 import com.project.demo.exception.Forbidden;
 import com.project.demo.mapper.UserMapper;
@@ -63,10 +64,15 @@ public class UserService implements IUserService, UserDetailsService {
 
     @Override
     @Transactional
-    public UserGetDto updateUser(UserPostDto dto, Long id, User loggedUser) {
+    public UserGetDto updateUser(UserPostUpdateDto dto, Long id, User loggedUser) {
         User user = getById(id);
         if (!loggedUser.getUsername().equals(user.getUsername())) throw new Forbidden(
                 message.getMessage("access",null,Locale.US));
+        if(!Objects.isNull(dto.getOldPassword()) && !dto.getOldPassword().isEmpty())
+            if(!Objects.isNull(dto.getNewPassword())
+                    && !dto.getNewPassword().isEmpty()
+                    && encoder.matches(dto.getOldPassword(), loggedUser.getPassword()))
+                user.setPassword(encoder.encode(dto.getNewPassword()));
         User savedUser = repository.save(mapper.updateUserFromDto(dto, user));
         return mapper.userToDto(user);
     }
