@@ -51,6 +51,12 @@ public class RoleService implements IRoleService {
     }
 
     @Override
+    public Role getByName(String name) {
+        return repository.findByName(name).orElseThrow(() -> new BadRequest(
+                message.getMessage("role.notFound", null, Locale.US)));
+    }
+
+    @Override
     public RoleDto getRoleById(Long id) {
         Role role = getById(id);
         return mapper.roleToDto(role);

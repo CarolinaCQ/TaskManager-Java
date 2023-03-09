@@ -8,8 +8,8 @@ import com.project.demo.mapper.ProjectMapper;
 import com.project.demo.model.Project;
 import com.project.demo.model.User;
 import com.project.demo.repository.ProjectRepository;
-import com.project.demo.repository.UserRepository;
 import com.project.demo.service.IProjectService;
+import com.project.demo.service.IUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
@@ -28,7 +28,7 @@ import static com.project.demo.util.Contants.Page.URI_PAGE_PROJECT;
 public class ProjectService implements IProjectService {
 
     private final ProjectRepository repository;
-    private final UserRepository userRepository;
+    private final IUserService userService;
     private final ProjectMapper mapper;
     private final MessageSource message;
 
@@ -67,7 +67,7 @@ public class ProjectService implements IProjectService {
 
     @Override
     public List<ProjectDto> getAllProjectsByUserId(Long id) {
-        User user = userRepository.findById(id).get();
+        User user = userService.getById(id);
         List<Project> projects = user.getProjects();
         return mapper.projectsToDtos(projects);
     }

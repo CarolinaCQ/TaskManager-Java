@@ -2,6 +2,7 @@ package com.project.demo.documentation;
 
 import com.project.demo.dto.UserGetDto;
 import com.project.demo.dto.UserPostDto;
+import com.project.demo.model.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -9,6 +10,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
@@ -68,7 +70,7 @@ public interface IAuthController {
             @ApiResponse(responseCode = STATUS_FORBIDDEN, description = NO_AUTHORIZATION, content = {@Content}),
             @ApiResponse(responseCode = STATUS_INTERNAL_SERVER_ERROR, description = ERROR_SERVER, content = {@Content})
     })
-    ResponseEntity<UserGetDto> updateUser(@RequestBody @Valid UserPostDto dto, @PathVariable Long id);
+    ResponseEntity<UserGetDto> updateUser(@RequestBody @Valid UserPostDto dto, @PathVariable Long id, @AuthenticationPrincipal User loggedUser);
 
     @Operation(summary = SUMARY_DELETE, description = DESCRIPTION_DELETE)
     @ApiResponses(value = {
@@ -76,5 +78,5 @@ public interface IAuthController {
             @ApiResponse(responseCode = STATUS_NOT_FOUND, description = NOT_FOUND_USER, content = {@Content}),
             @ApiResponse(responseCode = STATUS_FORBIDDEN, description = NO_AUTHORIZATION, content = {@Content})
     })
-    ResponseEntity<Void> deleteUser(@PathVariable Long id);
+    ResponseEntity<Void> deleteUser(@PathVariable Long id, @AuthenticationPrincipal User loggedUser);
 }

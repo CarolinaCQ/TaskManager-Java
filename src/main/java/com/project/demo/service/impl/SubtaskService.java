@@ -38,10 +38,10 @@ public class SubtaskService implements ISubtaskService {
     public SubtaskGetDto createSubtask(SubtaskPostDto dto, User loggedUser) {
         Subtask subtask = mapper.dtoToSubtask(dto);
         subtask.setTask(taskRepository.findById(dto.getIdTask()).get());
-        subtask.getTask().getSubtasks().add(subtask);
         if(!loggedUser.getUsername().equals(subtask.getTask().getProject().getUser().getUsername()))
             throw new Forbidden(message.getMessage("access",null,Locale.US));
         Subtask savedSubtask = repository.save(subtask);
+        subtask.getTask().getSubtasks().add(savedSubtask);
         return mapper.subtaskToDto(savedSubtask);
     }
 

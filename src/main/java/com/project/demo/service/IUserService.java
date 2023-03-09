@@ -11,9 +11,9 @@ public interface IUserService {
 
     UserGetDto registerUser (UserPostDto dto);
     UserGetDto loadUserData (UserPostDto dto);
-    UserGetDto updateUser(UserPostDto dto, Long id);
-    Optional<User> findById(Long id);
-    UserGetDto getById(Long id);
+    UserGetDto updateUser(UserPostDto dto, Long id, User loggedUser);
+    User getById(Long id);
+    UserGetDto getUserById(Long id);
     List<UserGetDto> getAllUsers();
-    void deleteUser(Long id);
+    void deleteUser(Long id, User loggedUser);
 }

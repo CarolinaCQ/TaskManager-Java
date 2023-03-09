@@ -14,6 +14,7 @@ public interface IRoleService {
     void loadRoleData(RoleDto dto);
     RoleDto updateRole (RoleDto dto, Long id);
     Role getById (Long id);
+    Role getByName (String name);
     RoleDto getRoleById (Long id);
     void deleteRole (Long id);
     List<RoleDto> getAllRoles();

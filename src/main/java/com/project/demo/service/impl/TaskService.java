@@ -49,16 +49,19 @@ public class TaskService implements ITaskService {
 
         Project project= projectService.getById(dto.getIdProject());
         task.setProject(project);
-        project.getTasks().add(task);
 
         Condition condition = conditionService.getById(1L);
         task.setCondition(condition);
-        condition.getTasks().add(task);
+
 
         if(!loggedUser.getUsername().equals(project.getUser().getUsername()))
             throw new Forbidden(message.getMessage("access", null, Locale.US));
 
         Task savedTask = repository.save(task);
+
+        project.getTasks().add(savedTask);
+        condition.getTasks().add(savedTask);
+
         return mapper.taskToDto(savedTask);
     }
 
@@ -74,6 +77,8 @@ public class TaskService implements ITaskService {
     @Transactional
     public TaskGetDto updateTask(TaskPostDto dto, Long id, User loggedUser) {
         Task task = getById(id);
+        if(!loggedUser.getUsername().equals(task.getProject().getUser().getUsername()))
+            throw new Forbidden(message.getMessage("access", null, Locale.US));
         Task savedTask = repository.save(mapper.updateTaskFromDto(dto, task));
         savedTask.setDuration(durationTask(task));
         return mapper.taskToDto(savedTask);
@@ -108,6 +113,8 @@ public class TaskService implements ITaskService {
     @Transactional
     public void deleteTask(Long id, User loggedUser) {
         Task task = getById(id);
+        if(!loggedUser.getUsername().equals(task.getProject().getUser().getUsername()))
+            throw new Forbidden(message.getMessage("access", null, Locale.US));
         repository.deleteById(id);
     }
 

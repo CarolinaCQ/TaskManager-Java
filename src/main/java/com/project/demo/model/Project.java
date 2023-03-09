@@ -47,7 +47,7 @@ public class Project {
     @Column(name = "deleted")
     private Boolean deleted = Boolean.FALSE;
 
-    @OneToMany(mappedBy = "project")
+    @OneToMany(mappedBy = "project", fetch = EAGER)
     @JsonIgnoreProperties("project")
     private List<Task> tasks;
 
