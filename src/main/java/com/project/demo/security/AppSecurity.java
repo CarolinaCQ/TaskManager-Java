@@ -1,7 +1,6 @@
 package com.project.demo.security;
 
-import com.project.demo.filter.CustomAuthenticationFilter;
-import com.project.demo.filter.CustomAuthorizationFilter;
+import com.project.demo.filter.JwtFilter;
 import com.project.demo.service.impl.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -26,21 +25,23 @@ import static com.project.demo.util.Contants.Roles.*;
 public class AppSecurity extends WebSecurityConfigurerAdapter {
 
     private final UserService userService;
+    private final JwtFilter jwtFilter;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.csrf().disable();
-        CustomAuthenticationFilter customAuthenticationFilter = new CustomAuthenticationFilter(authenticationManagerBean());
-        customAuthenticationFilter.setFilterProcessesUrl("/auth/login");
-        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         http
+                .csrf()
+                .disable()
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
                 .authorizeRequests()
                 .antMatchers(AUTH).permitAll()
                 .antMatchers(API_DOCUMENTATION).permitAll()
                 .antMatchers(HttpMethod.GET, USERS).hasAnyAuthority(ROLE_ADMIN)
-                .anyRequest().authenticated();
-        http.addFilter(customAuthenticationFilter);
-        http.addFilterBefore(new CustomAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
+                .anyRequest().authenticated()
+                .and()
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
     }
 
     @Bean
