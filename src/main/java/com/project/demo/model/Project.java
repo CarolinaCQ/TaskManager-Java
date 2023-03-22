@@ -51,7 +51,7 @@ public class Project {
     @JsonIgnoreProperties("project")
     private List<Task> tasks;
 
-    @ManyToOne(fetch = EAGER)
+    @ManyToOne
     @JsonIgnoreProperties("projects")
     private User user;
 

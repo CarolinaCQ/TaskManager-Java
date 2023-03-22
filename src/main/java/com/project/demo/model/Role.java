@@ -1,5 +1,6 @@
 package com.project.demo.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.SQLDelete;
@@ -11,6 +12,7 @@ import javax.validation.constraints.NotNull;
 import java.util.List;
 
 import static javax.persistence.FetchType.EAGER;
+import static javax.persistence.FetchType.LAZY;
 import static javax.persistence.GenerationType.IDENTITY;
 
 @Entity
@@ -36,6 +38,7 @@ public class Role implements GrantedAuthority {
     private Boolean deleted = Boolean.FALSE;
 
     @ManyToMany(mappedBy = "roles", fetch = EAGER)
+    @JsonIgnoreProperties("roles")
     private List<User> users;
 
     @Override

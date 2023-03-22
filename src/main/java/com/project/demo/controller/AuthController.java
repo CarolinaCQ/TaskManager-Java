@@ -1,8 +1,6 @@
 package com.project.demo.controller;
 
-import com.project.demo.dto.UserGetDto;
-import com.project.demo.dto.UserPostDto;
-import com.project.demo.dto.UserPostUpdateDto;
+import com.project.demo.dto.*;
 import com.project.demo.model.User;
 import com.project.demo.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,8 +26,9 @@ public class AuthController {
     }
 
     @PostMapping("auth/login")
-    public ResponseEntity<?> login(@RequestParam String username, @RequestParam String password, HttpServletResponse response){
-        return ResponseEntity.status(HttpStatus.OK).body(response.getContentType());
+    public ResponseEntity<LoginResponseDto> login(@Valid @RequestBody LoginRequestDto dto){
+        LoginResponseDto response = service.loginUser(dto);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @GetMapping("users/{id}")

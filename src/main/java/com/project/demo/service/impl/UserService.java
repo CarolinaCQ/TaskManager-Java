@@ -1,10 +1,9 @@
 package com.project.demo.service.impl;
 
-import com.project.demo.dto.UserGetDto;
-import com.project.demo.dto.UserPostDto;
-import com.project.demo.dto.UserPostUpdateDto;
+import com.project.demo.dto.*;
 import com.project.demo.exception.BadRequest;
 import com.project.demo.exception.Forbidden;
+import com.project.demo.filter.JwtService;
 import com.project.demo.mapper.UserMapper;
 import com.project.demo.model.Role;
 import com.project.demo.model.User;
@@ -13,6 +12,8 @@ import com.project.demo.service.IRoleService;
 import com.project.demo.service.IUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -21,10 +22,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 import static com.project.demo.util.Contants.Roles.ROLE_ADMIN;
 import static com.project.demo.util.Contants.Roles.ROLE_USER;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
 @Service
 @RequiredArgsConstructor
@@ -32,6 +35,8 @@ public class UserService implements IUserService, UserDetailsService {
 
     private final UserRepository repository;
     private final IRoleService roleService;
+    private final AuthenticationManager authenticationManager;
+    private final JwtService jwtService;
     private final UserMapper mapper;
     private final MessageSource message;
     private final PasswordEncoder encoder;
@@ -63,16 +68,28 @@ public class UserService implements IUserService, UserDetailsService {
     }
 
     @Override
+    public LoginResponseDto loginUser(LoginRequestDto dto) {
+        authenticationManager.authenticate( new UsernamePasswordAuthenticationToken(
+                        dto.getUsername(),
+                        dto.getPassword()
+                )
+        );
+        User user = repository.findByUsername(dto.getUsername()).orElseThrow(() -> new UsernameNotFoundException(message.getMessage("user.notFound",null, Locale.US)));
+        String token = jwtService.generateToken(user);
+        return new LoginResponseDto(token);
+    }
+
+    @Override
     @Transactional
     public UserGetDto updateUser(UserPostUpdateDto dto, Long id, User loggedUser) {
         User user = getById(id);
         if (!loggedUser.getUsername().equals(user.getUsername())) throw new Forbidden(
                 message.getMessage("access",null,Locale.US));
-        if(!Objects.isNull(dto.getOldPassword()) && !dto.getOldPassword().isEmpty())
-            if(!Objects.isNull(dto.getNewPassword())
-                    && !dto.getNewPassword().isEmpty()
-                    && encoder.matches(dto.getOldPassword(), loggedUser.getPassword()))
-                user.setPassword(encoder.encode(dto.getNewPassword()));
+        if(!encoder.matches(dto.getOldPassword(), user.getPassword())) {
+            throw new BadRequest(message.getMessage("password", null, Locale.US));
+        } else if (!Objects.isNull(dto.getNewPassword()) && !dto.getNewPassword().isEmpty()) {
+            user.setPassword(encoder.encode(dto.getNewPassword()));
+        }
         User savedUser = repository.save(mapper.updateUserFromDto(dto, user));
         return mapper.userToDto(user);
     }

@@ -4,19 +4,20 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.*;
-import org.hibernate.validator.constraints.UniqueElements;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
-import static javax.persistence.CascadeType.PERSIST;
 import static javax.persistence.FetchType.EAGER;
 import static javax.persistence.GenerationType.IDENTITY;
 
@@ -34,7 +35,6 @@ public class User implements UserDetails{
     private Long id;
 
     @NotNull
-    @UniqueElements(message = "user.exists")
     @Column(name = "username")
     private String username;
 
@@ -54,16 +54,19 @@ public class User implements UserDetails{
     private Boolean deleted = Boolean.FALSE;
 
     @ManyToMany(fetch =
-            EAGER,
-            cascade = PERSIST)
+            FetchType.EAGER,
+            cascade = CascadeType.PERSIST)
     @JoinTable(name = "user_role",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))
-    private List<Role> roles;
+    private Set<Role> roles;
 
     @OneToMany(mappedBy = "user", fetch = EAGER)
     @JsonIgnoreProperties("user")
     private List<Project> projects;
+
+    @Override
+    public String getUsername(){return username;}
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
