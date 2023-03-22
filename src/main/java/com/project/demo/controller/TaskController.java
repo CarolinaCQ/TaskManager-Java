@@ -3,11 +3,13 @@ package com.project.demo.controller;
 import com.project.demo.documentation.ITaskController;
 import com.project.demo.dto.TaskGetDto;
 import com.project.demo.dto.TaskPostDto;
+import com.project.demo.model.User;
 import com.project.demo.service.ITaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -22,7 +24,7 @@ public class TaskController implements ITaskController {
 
     @GetMapping("/{id}")
     public ResponseEntity<TaskGetDto> getTaskById(@PathVariable Long id){
-        TaskGetDto task = service.getById(id);
+        TaskGetDto task = service.getTaskById(id);
         return ResponseEntity.status(HttpStatus.OK).body(task);
     }
 
@@ -39,20 +41,20 @@ public class TaskController implements ITaskController {
     }
 
     @PostMapping
-    public ResponseEntity<TaskGetDto> createTask(@RequestBody @Valid TaskPostDto dto){
-        TaskGetDto task = service.createTask(dto);
+    public ResponseEntity<TaskGetDto> createTask(@RequestBody @Valid TaskPostDto dto, @AuthenticationPrincipal User loggedUser){
+        TaskGetDto task = service.createTask(dto, loggedUser);
         return ResponseEntity.status(HttpStatus.CREATED).body(task);
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<TaskGetDto> updateTask(@RequestBody @Valid TaskPostDto dto, @PathVariable Long id){
-        TaskGetDto task = service.updateTask(dto, id);
+    public ResponseEntity<TaskGetDto> updateTask(@RequestBody @Valid TaskPostDto dto, @PathVariable Long id, @AuthenticationPrincipal User loggedUser){
+        TaskGetDto task = service.updateTask(dto, id, loggedUser);
         return ResponseEntity.status(HttpStatus.OK).body(task);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteTask(@PathVariable Long id){
-        service.deleteTask(id);
+    public ResponseEntity<Void> deleteTask(@PathVariable Long id, @AuthenticationPrincipal User loggedUser){
+        service.deleteTask(id, loggedUser);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 }

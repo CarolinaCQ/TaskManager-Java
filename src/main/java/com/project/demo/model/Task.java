@@ -14,6 +14,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static javax.persistence.FetchType.EAGER;
 import static javax.persistence.GenerationType.IDENTITY;
 
 @Entity
@@ -52,7 +53,7 @@ public class Task {
     private LocalDateTime updateDate;
 
     @Column(name = "deleted")
-    private Boolean deleted;
+    private Boolean deleted = Boolean.FALSE;
 
     @ManyToOne
     @JoinColumn(name = "condition_id")
@@ -64,7 +65,7 @@ public class Task {
     @JsonIgnoreProperties("tasks")
     private Project project;
 
-    @OneToMany(mappedBy = "task")
+    @OneToMany(mappedBy = "task", fetch = EAGER)
     @JsonIgnoreProperties("task")
     private List<Subtask> subtasks;
 }

@@ -45,13 +45,13 @@ public class Project {
     private LocalDateTime updateDate;
 
     @Column(name = "deleted")
-    private Boolean deleted;
+    private Boolean deleted = Boolean.FALSE;
 
-    @OneToMany(mappedBy = "project")
+    @OneToMany(mappedBy = "project", fetch = EAGER)
     @JsonIgnoreProperties("project")
     private List<Task> tasks;
 
-    @ManyToOne(fetch = EAGER)
+    @ManyToOne
     @JsonIgnoreProperties("projects")
     private User user;
 

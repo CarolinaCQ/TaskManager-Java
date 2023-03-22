@@ -5,17 +5,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDate;
-
-@Setter
 @Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class TaskPostDto {
-
-    private String title;
-    private String description;
-    private LocalDate finishDate;
-    private Long idProject;
-
+public class LoginRequestDto {
+    private String username;
+    private String password;
 }

@@ -2,17 +2,16 @@ package com.project.demo.service.impl;
 
 import com.project.demo.dto.SubtaskGetDto;
 import com.project.demo.dto.SubtaskPostDto;
-import com.project.demo.dto.TaskGetDto;
 import com.project.demo.exception.BadRequest;
+import com.project.demo.exception.Forbidden;
 import com.project.demo.exception.NotFound;
 import com.project.demo.mapper.SubtaskMapper;
-import com.project.demo.model.Condition;
 import com.project.demo.model.Subtask;
-import com.project.demo.model.Task;
+import com.project.demo.model.User;
 import com.project.demo.repository.SubtaskRepository;
 import com.project.demo.repository.TaskRepository;
 import com.project.demo.service.ISubtaskService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -26,57 +25,45 @@ import java.util.*;
 import static com.project.demo.util.Contants.Page.*;
 
 @Service
+@RequiredArgsConstructor
 public class SubtaskService implements ISubtaskService {
 
-    @Autowired
-    private SubtaskRepository repository;
-
-    @Autowired
-    private TaskRepository taskRepository;
-
-    @Autowired
-    private SubtaskMapper mapper;
-
-    @Autowired
-    private MessageSource message;
+    private final SubtaskRepository repository;
+    private final TaskRepository taskRepository;
+    private final SubtaskMapper mapper;
+    private final MessageSource message;
 
     @Override
     @Transactional
-    public SubtaskGetDto createSubtask(SubtaskPostDto dto) {
+    public SubtaskGetDto createSubtask(SubtaskPostDto dto, User loggedUser) {
         Subtask subtask = mapper.dtoToSubtask(dto);
-        subtask.setDeleted(false);
-        addTaskToSubtasks(subtask, dto.getIdTask());
+        subtask.setTask(taskRepository.findById(dto.getIdTask()).get());
+        if(!loggedUser.getUsername().equals(subtask.getTask().getProject().getUser().getUsername()))
+            throw new Forbidden(message.getMessage("access",null,Locale.US));
         Subtask savedSubtask = repository.save(subtask);
+        subtask.getTask().getSubtasks().add(savedSubtask);
         return mapper.subtaskToDto(savedSubtask);
     }
 
-    @Transactional
-    private void addTaskToSubtasks(Subtask subtask, Long idTask){
-        Task task = taskRepository.findById(idTask).get();
-        subtask.setTask(task);
-
-        task.getSubtasks().add(subtask);
-    }
-
     @Override
     @Transactional
-    public SubtaskGetDto updateSubtask(SubtaskPostDto dto, Long id) {
-        if(!findById(id).isPresent()) throw new BadRequest(
-                message.getMessage("subtask.notFound", null, Locale.US));
-        Subtask subtask = repository.save(mapper.updateSubtaskFromDto(dto, findById(id).get()));
-        return mapper.subtaskToDto(subtask);
+    public SubtaskGetDto updateSubtask(SubtaskPostDto dto, Long id, User loggedUser) {
+        Subtask subtask = getById(id);
+        if(!loggedUser.getUsername().equals(subtask.getTask().getProject().getUser().getUsername()))
+            throw new Forbidden(message.getMessage("access",null,Locale.US));
+        Subtask savedSubtask = repository.save(mapper.updateSubtaskFromDto(dto, subtask));
+        return mapper.subtaskToDto(savedSubtask);
     }
 
     @Override
-    public Optional<Subtask> findById(Long id) {
-        return repository.findById(id);
+    public Subtask getById(Long id) {
+        return repository.findById(id).orElseThrow(() -> new BadRequest(
+                message.getMessage("subtask.notFound", null, Locale.US)));
     }
 
     @Override
-    public SubtaskGetDto getById(Long id) {
-        if(!findById(id).isPresent()) throw new BadRequest(
-                message.getMessage("subtask.notFound", null, Locale.US));
-        Subtask subtask = findById(id).get();
+    public SubtaskGetDto getSubtaskById(Long id) {
+        Subtask subtask = getById(id);
         return mapper.subtaskToDto(subtask);
     }
 
@@ -90,9 +77,10 @@ public class SubtaskService implements ISubtaskService {
 
     @Override
     @Transactional
-    public void deleteSubtask(Long id) {
-        if(!findById(id).isPresent()) throw new BadRequest(
-                message.getMessage("subtask.notFound", null, Locale.US));
+    public void deleteSubtask(Long id, User loggedUser) {
+        Subtask subtask = getById(id);
+        if(!loggedUser.getUsername().equals(subtask.getTask().getProject().getUser().getUsername()))
+            throw new Forbidden(message.getMessage("access",null,Locale.US));
         repository.deleteById(id);
     }
 

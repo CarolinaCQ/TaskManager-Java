@@ -2,19 +2,19 @@ package com.project.demo.service.impl;
 
 import com.project.demo.dto.ProjectDto;
 import com.project.demo.exception.BadRequest;
+import com.project.demo.exception.Forbidden;
 import com.project.demo.exception.NotFound;
 import com.project.demo.mapper.ProjectMapper;
 import com.project.demo.model.Project;
 import com.project.demo.model.User;
 import com.project.demo.repository.ProjectRepository;
-import com.project.demo.repository.UserRepository;
 import com.project.demo.service.IProjectService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.project.demo.service.IUserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,73 +24,60 @@ import java.util.*;
 import static com.project.demo.util.Contants.Page.URI_PAGE_PROJECT;
 
 @Service
+@RequiredArgsConstructor
 public class ProjectService implements IProjectService {
 
-    @Autowired
-    private ProjectRepository repository;
-
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private ProjectMapper mapper;
-
-    @Autowired
-    private MessageSource message;
+    private final ProjectRepository repository;
+    private final IUserService userService;
+    private final ProjectMapper mapper;
+    private final MessageSource message;
 
     @Override
     @Transactional
-    public ProjectDto createProject(ProjectDto dto) {
+    public ProjectDto createProject(ProjectDto dto, User loggedUser) {
         Project project = mapper.dtoToProject(dto);
-        project.setDeleted(false);
-        addUserToProject(project);
+        project.setUser(loggedUser);
+        loggedUser.getProjects().add(project);
+        if(!loggedUser.getUsername().equals(project.getUser().getUsername()))
+            throw new Forbidden(message.getMessage("access", null, Locale.US));
         Project savedProject = repository.save(project);
         return mapper.projectToDto(savedProject);
     }
 
-    @Transactional
-    private void addUserToProject(Project project) {
-        String loggedUser = SecurityContextHolder.getContext().getAuthentication().getName();
-        User user = userRepository.findByUsername(loggedUser).get();
-        project.setUser(user);
-
-        List<Project> projects = user.getProjects();
-        projects.add(project);
-    }
-
     @Override
     @Transactional
-    public ProjectDto updateProject(ProjectDto dto, Long id) {
-        if(!findById(id).isPresent()) throw new BadRequest(
-                message.getMessage("project.notFound", null, Locale.US));
-        Project project = repository.save(mapper.updateProjectFromDto(dto, findById(id).get()));
+    public ProjectDto updateProject(ProjectDto dto, Long id, User loggedUser) {
+        Project project = getById(id);
+        if(!loggedUser.getUsername().equals(project.getUser().getUsername()))
+            throw new Forbidden(message.getMessage("access", null, Locale.US));
+        Project savedProject = repository.save(mapper.updateProjectFromDto(dto, project));
         return mapper.projectToDto(project);
     }
 
     @Override
-    public Optional<Project> findById(Long id) {
-        return repository.findById(id);
+    public Project getById(Long id) {
+        return repository.findById(id).orElseThrow(() -> new BadRequest(
+                message.getMessage("project.notFound", null, Locale.US)));
     }
 
     @Override
-    public ProjectDto getById(Long id) {
-        if(!findById(id).isPresent()) throw new BadRequest(
-                message.getMessage("project.notFound", null, Locale.US));
-        return mapper.projectToDto(findById(id).get());
+    public ProjectDto getProjectById(Long id) {
+        return mapper.projectToDto(getById(id));
     }
 
     @Override
     public List<ProjectDto> getAllProjectsByUserId(Long id) {
-        User user = userRepository.findById(id).get();
+        User user = userService.getById(id);
         List<Project> projects = user.getProjects();
         return mapper.projectsToDtos(projects);
     }
 
     @Override
     @Transactional
-    public void deleteProject(Long id) {
-        if(!findById(id).isPresent()) throw new BadRequest(
-                message.getMessage("project.notFound", null, Locale.US));
+    public void deleteProject(Long id, User loggedUser) {
+        Project project = getById(id);
+        if(!loggedUser.getUsername().equals(project.getUser().getUsername()))
+            throw new Forbidden(message.getMessage("access", null, Locale.US));
         repository.deleteById(id);
     }
 

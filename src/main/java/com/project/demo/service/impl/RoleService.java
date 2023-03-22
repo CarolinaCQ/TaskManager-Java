@@ -6,32 +6,26 @@ import com.project.demo.mapper.RoleMapper;
 import com.project.demo.model.Role;
 import com.project.demo.repository.RoleRepository;
 import com.project.demo.service.IRoleService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Locale;
-import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class RoleService implements IRoleService {
 
-    @Autowired
-    private RoleRepository repository;
-
-    @Autowired
-    private RoleMapper mapper;
-
-    @Autowired
-    private MessageSource message;
+    private final RoleRepository repository;
+    private final RoleMapper mapper;
+    private final MessageSource message;
 
     @Override
     @Transactional
     public RoleDto createRole(RoleDto dto) {
         Role role = mapper.dtoToRole(dto);
-        role.setDeleted(false);
         Role savedRole = repository.save(role);
         return mapper.roleToDto(savedRole);
     }
@@ -39,36 +33,38 @@ public class RoleService implements IRoleService {
     @Override
     public void loadRoleData(RoleDto dto) {
         Role role = mapper.dtoToRole(dto);
-        role.setDeleted(false);
         repository.save(role);
     }
 
     @Override
     @Transactional
     public RoleDto updateRole(RoleDto dto, Long id) {
-        if(!findById(id).isPresent()) throw new BadRequest(
-                message.getMessage("role.notFound", null, Locale.US));
-        Role role = mapper.updateRoleFromDto(dto, findById(id).get());
-        return mapper.roleToDto(role);
+        Role role = getById(id);
+        Role savedRole = mapper.updateRoleFromDto(dto, role);
+        return mapper.roleToDto(savedRole);
     }
 
     @Override
-    public Optional<Role> findById(Long id) {
-        return repository.findById(id);
+    public Role getById(Long id) {
+        return repository.findById(id).orElseThrow(() -> new BadRequest(
+                message.getMessage("role.notFound", null, Locale.US)));
     }
 
     @Override
-    public RoleDto getById(Long id) {
-        if(!findById(id).isPresent()) throw new BadRequest(
-                message.getMessage("role.notFound", null, Locale.US));
-        Role role = findById(id).get();
+    public Role getByName(String name) {
+        return repository.findByName(name).orElseThrow(() -> new BadRequest(
+                message.getMessage("role.notFound", null, Locale.US)));
+    }
+
+    @Override
+    public RoleDto getRoleById(Long id) {
+        Role role = getById(id);
         return mapper.roleToDto(role);
     }
 
     @Override
     public void deleteRole(Long id) {
-        if(!findById(id).isPresent()) throw new BadRequest(
-                message.getMessage("role.notFound", null, Locale.US));
+        Role role = getById(id);
         repository.deleteById(id);
     }
 

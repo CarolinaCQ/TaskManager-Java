@@ -1,19 +1,20 @@
 package com.project.demo.service.impl;
 
-import com.project.demo.dto.UserGetDto;
-import com.project.demo.dto.UserPostDto;
+import com.project.demo.dto.*;
 import com.project.demo.exception.BadRequest;
 import com.project.demo.exception.Forbidden;
+import com.project.demo.filter.JwtService;
 import com.project.demo.mapper.UserMapper;
 import com.project.demo.model.Role;
 import com.project.demo.model.User;
-import com.project.demo.repository.RoleRepository;
 import com.project.demo.repository.UserRepository;
+import com.project.demo.service.IRoleService;
 import com.project.demo.service.IUserService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -21,28 +22,24 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 import static com.project.demo.util.Contants.Roles.ROLE_ADMIN;
 import static com.project.demo.util.Contants.Roles.ROLE_USER;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
 @Service
+@RequiredArgsConstructor
 public class UserService implements IUserService, UserDetailsService {
 
-    @Autowired
-    private UserRepository repository;
-
-    @Autowired
-    private RoleRepository roleRepository;
-
-    @Autowired
-    private UserMapper mapper;
-
-    @Autowired
-    private MessageSource message;
-
-    @Autowired
-    private PasswordEncoder encoder;
+    private final UserRepository repository;
+    private final IRoleService roleService;
+    private final AuthenticationManager authenticationManager;
+    private final JwtService jwtService;
+    private final UserMapper mapper;
+    private final MessageSource message;
+    private final PasswordEncoder encoder;
 
     @Override
     @Transactional
@@ -51,9 +48,10 @@ public class UserService implements IUserService, UserDetailsService {
                 message.getMessage("user.exists", null, Locale.US));
         User user = mapper.dtoToUser(dto);
         user.setPassword(encoder.encode(dto.getPassword()));
-        user.setDeleted(false);
+        Role role =  roleService.getByName(ROLE_USER);
+        user.getRoles().add(role);
         User savedUser = repository.save(user);
-        addRoleToUser(ROLE_USER, savedUser);
+        role.getUsers().add(savedUser);
         return mapper.userToDto(savedUser);
     }
 
@@ -62,51 +60,49 @@ public class UserService implements IUserService, UserDetailsService {
     public UserGetDto loadUserData(UserPostDto dto) {
         User user = mapper.dtoToUser(dto);
         user.setPassword(encoder.encode(dto.getPassword()));
-        user.setDeleted(false);
+        Role role =  roleService.getByName(ROLE_ADMIN);
+        user.getRoles().add(role);
         User savedUser = repository.save(user);
-        addRoleToUser(ROLE_ADMIN, savedUser);
+        role.getUsers().add(savedUser);
         return mapper.userToDto(savedUser);
     }
 
-
-    @Transactional
-    private void addRoleToUser(String nameRole, User user) {
-        List<Role> roles = new ArrayList<>();
-        Role role = roleRepository.findByName(nameRole).get();
-        roles.add(role);
-        user.setRoles(roles);
-
-        role.getUsers().add(user);
+    @Override
+    public LoginResponseDto loginUser(LoginRequestDto dto) {
+        authenticationManager.authenticate( new UsernamePasswordAuthenticationToken(
+                        dto.getUsername(),
+                        dto.getPassword()
+                )
+        );
+        User user = repository.findByUsername(dto.getUsername()).orElseThrow(() -> new UsernameNotFoundException(message.getMessage("user.notFound",null, Locale.US)));
+        String token = jwtService.generateToken(user);
+        return new LoginResponseDto(token);
     }
 
     @Override
     @Transactional
-    public UserGetDto updateUser(UserPostDto dto, Long id) {
-        if(!findById(id).isPresent()) throw new BadRequest(
-                message.getMessage("user.notFound", null, Locale.US));
-        String username = findById(id).get().getUsername();
-        String logged = SecurityContextHolder.getContext().getAuthentication().getName();
-        if (!logged.equals(username)) throw new Forbidden(
-                message.getMessage("mismatch.users",null,Locale.US));
-        User user = repository.save(mapper.updateUserFromDto(dto, findById(id).get()));
+    public UserGetDto updateUser(UserPostUpdateDto dto, Long id, User loggedUser) {
+        User user = getById(id);
+        if (!loggedUser.getUsername().equals(user.getUsername())) throw new Forbidden(
+                message.getMessage("access",null,Locale.US));
+        if(!encoder.matches(dto.getOldPassword(), user.getPassword())) {
+            throw new BadRequest(message.getMessage("password", null, Locale.US));
+        } else if (!Objects.isNull(dto.getNewPassword()) && !dto.getNewPassword().isEmpty()) {
+            user.setPassword(encoder.encode(dto.getNewPassword()));
+        }
+        User savedUser = repository.save(mapper.updateUserFromDto(dto, user));
         return mapper.userToDto(user);
     }
 
     @Override
-    public Optional<User> findById(Long id) {
-        return repository.findById(id);
+    public User getById(Long id) {
+        return repository.findById(id).orElseThrow(() -> new BadRequest(
+                message.getMessage("user.notFound", null, Locale.US)));
     }
 
     @Override
-    public UserGetDto getById(Long id) {
-        if(!findById(id).isPresent()) throw new BadRequest(
-                message.getMessage("user.notFound", null, Locale.US));
-        String username = findById(id).get().getUsername();
-        String logged = SecurityContextHolder.getContext().getAuthentication().getName();
-        if (!logged.equals(username)) throw new Forbidden(
-                message.getMessage("mismatch.users",null,Locale.US));
-        User user = findById(id).get();
-        return mapper.userToDto(user);
+    public UserGetDto getUserById(Long id) {
+        return mapper.userToDto(getById(id));
     }
 
     @Override
@@ -117,13 +113,10 @@ public class UserService implements IUserService, UserDetailsService {
 
     @Override
     @Transactional
-    public void deleteUser(Long id) {
-        if(!findById(id).isPresent()) throw new BadRequest(
-                message.getMessage("user.notFound", null, Locale.US));
-        String username = findById(id).get().getUsername();
-        String logged = SecurityContextHolder.getContext().getAuthentication().getName();
-        if (!logged.equals(username)) throw new Forbidden(
-                message.getMessage("mismatch.users",null,Locale.US));
+    public void deleteUser(Long id, User loggedUser) {
+        User user = getById(id);
+        if (!loggedUser.getUsername().equals(user.getUsername())) throw new Forbidden(
+                message.getMessage("access",null,Locale.US));
         repository.deleteById(id);
     }
 
