@@ -32,7 +32,7 @@ public interface ISubtaskController {
             @ApiResponse(responseCode = STATUS_BAD_REQUEST, description = INVALID_DATA, content = {@Content}),
             @ApiResponse(responseCode = STATUS_FORBIDDEN, description = NO_AUTHORIZATION, content = {@Content})
     })
-    ResponseEntity<SubtaskGetDto> getSubtaskById(@Parameter(name = PARAMETER_ID) @PathVariable Long id);
+    ResponseEntity<SubtaskGetDto> getSubtaskById(@Parameter(name = PARAMETER_ID) Long id);
 
     @Operation(summary = SUMARY_PAGINATION, description = DESCRIPTION_PAGINATION)
     @ApiResponses(value = {
@@ -41,7 +41,7 @@ public interface ISubtaskController {
             @ApiResponse(responseCode = STATUS_BAD_REQUEST, description = INVALID_DATA, content = {@Content}),
             @ApiResponse(responseCode = STATUS_FORBIDDEN, description = NO_AUTHORIZATION, content = {@Content})
     })
-    ResponseEntity<Map<String,Object>> pageSubtasks(@Parameter(name = PARAMETER_SUBTASK_PAGE) @RequestParam Integer numberPage, @Parameter(name = PARAMETER_ID) @RequestParam Long id, Pageable pageable);
+    ResponseEntity<Map<String,Object>> pageSubtasks(@Parameter(name = PARAMETER_SUBTASK_PAGE) Integer numberPage, @Parameter(name = PARAMETER_ID) Long id, Pageable pageable);
 
     @Operation(summary = SUMARY_ADD, description = DESCRIPTION_ADD)
     @ApiResponses(value = {
@@ -51,7 +51,7 @@ public interface ISubtaskController {
             @ApiResponse(responseCode = STATUS_FORBIDDEN, description = NO_AUTHORIZATION, content = {@Content}),
             @ApiResponse(responseCode = STATUS_INTERNAL_SERVER_ERROR, description = ERROR_SERVER, content = {@Content})
     })
-    ResponseEntity<SubtaskGetDto> createSubtask(@Parameter(name = PARAMETER_SUBTASK_ADD) @RequestBody @Valid SubtaskPostDto dto, @AuthenticationPrincipal User loggedUser);
+    ResponseEntity<SubtaskGetDto> createSubtask(@Parameter(name = PARAMETER_SUBTASK_ADD) SubtaskPostDto dto, User loggedUser);
 
     @Operation(summary = SUMARY_UPDATE, description = DESCRIPTION_UPDATE)
     @ApiResponses(value = {
@@ -62,7 +62,7 @@ public interface ISubtaskController {
             @ApiResponse(responseCode = STATUS_FORBIDDEN, description = NO_AUTHORIZATION, content = {@Content}),
             @ApiResponse(responseCode = STATUS_INTERNAL_SERVER_ERROR, description = ERROR_SERVER, content = {@Content})
     })
-    ResponseEntity<SubtaskGetDto> updateSubtask(@Parameter(name = PARAMETER_SUBTASK_UPDATE) @RequestBody @Valid SubtaskPostDto dto, @Parameter(name = PARAMETER_ID) @PathVariable Long id, @AuthenticationPrincipal User loggedUser);
+    ResponseEntity<SubtaskGetDto> updateSubtask(@Parameter(name = PARAMETER_SUBTASK_UPDATE) SubtaskPostDto dto, @Parameter(name = PARAMETER_ID) Long id, User loggedUser);
 
     @Operation(summary = SUMARY_DELETE, description = DESCRIPTION_DELETE)
     @ApiResponses(value = {
@@ -70,5 +70,5 @@ public interface ISubtaskController {
             @ApiResponse(responseCode = STATUS_NOT_FOUND, description = NOT_FOUND_SUBTASK, content = {@Content}),
             @ApiResponse(responseCode = STATUS_FORBIDDEN, description = NO_AUTHORIZATION, content = {@Content})
     })
-    ResponseEntity<Void> deleteSubtask(@Parameter(name = PARAMETER_ID) @PathVariable Long id, @AuthenticationPrincipal User loggedUser);
+    ResponseEntity<Void> deleteSubtask(@Parameter(name = PARAMETER_ID) Long id, User loggedUser);
 }

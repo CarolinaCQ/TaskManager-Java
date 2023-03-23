@@ -56,12 +56,14 @@ public class Contants {
         public static final String ERROR_SERVER = "Internal Server Eror";
 
         public static final String SUMARY_ADD = "Add a project";
+        public static final String SUMARY_ADD_COLLABORATOR = "Add collaborator to project";
         public static final String SUMARY_UPDATE = "Update a project";
         public static final String SUMARY_DELETE = "Delete a project";
         public static final String SUMARY_PAGINATION = "Get project page";
         public static final String SUMARY_GET_ID = "Get project by Id";
 
         public static final String DESCRIPTION_ADD = "This endpoint is used to add a project";
+        public static final String DESCRIPTION_ADD_COLLABORATOR = "This endpoint is used to add collaborator to project";
         public static final String DESCRIPTION_UPDATE = "This endpoint is used to update a project";
         public static final String DESCRIPTION_DELETE = "This endpoint is used to delete a project by ID";
         public static final String DESCRIPTION_PAGINATION = "This endpoint is used to get project page";
@@ -71,6 +73,7 @@ public class Contants {
         public static final String PARAMETER_PROJECT_ADD = "Project to add";
         public static final String PARAMETER_PROJECT_UPDATE = "Project to update";
         public static final String PARAMETER_PROJECT_PAGE = "Size project page";
+        public static final String PARAMETER_USERNAME = "Username user";
 
     }
 
@@ -189,8 +192,9 @@ public class Contants {
         public static final String DESCRIPTION_GET_ID = "This endpoint is used to get a user by Id";
 
         public static final String PARAMETER_ID = "Id of the user";
-        public static final String PARAMETER_CONDITION_ADD = "User to add";
-        public static final String PARAMETER_CONDITION_UPDATE = "User to update";
+        public static final String PARAMETER_USER_ADD = "User to add";
+        public static final String PARAMETER_USER_UPDATE = "User to update";
+        public static final String PARAMETER_USER_LOGIN = "Username and user password to login";
 
     }
 }

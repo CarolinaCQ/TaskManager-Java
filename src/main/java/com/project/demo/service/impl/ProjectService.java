@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.net.URI;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.project.demo.util.Contants.Page.URI_PAGE_PROJECT;
 
@@ -36,10 +37,9 @@ public class ProjectService implements IProjectService {
     @Transactional
     public ProjectDto createProject(ProjectDto dto, User loggedUser) {
         Project project = mapper.dtoToProject(dto);
-        project.setUser(loggedUser);
+        project.getUsers().add(loggedUser);
         loggedUser.getProjects().add(project);
-        if(!loggedUser.getUsername().equals(project.getUser().getUsername()))
-            throw new Forbidden(message.getMessage("access", null, Locale.US));
+        validAccess(project,loggedUser);
         Project savedProject = repository.save(project);
         return mapper.projectToDto(savedProject);
     }
@@ -48,8 +48,7 @@ public class ProjectService implements IProjectService {
     @Transactional
     public ProjectDto updateProject(ProjectDto dto, Long id, User loggedUser) {
         Project project = getById(id);
-        if(!loggedUser.getUsername().equals(project.getUser().getUsername()))
-            throw new Forbidden(message.getMessage("access", null, Locale.US));
+        validAccess(project, loggedUser);
         Project savedProject = repository.save(mapper.updateProjectFromDto(dto, project));
         return mapper.projectToDto(project);
     }
@@ -66,24 +65,43 @@ public class ProjectService implements IProjectService {
     }
 
     @Override
-    public List<ProjectDto> getAllProjectsByUserId(Long id) {
+    public List<ProjectDto> getAllProjectsByUserId(Long id, User loggedUser) {
         User user = userService.getById(id);
-        List<Project> projects = user.getProjects();
-        return mapper.projectsToDtos(projects);
+        if(!loggedUser.getUsername().equals(user.getUsername()))
+            throw new Forbidden(message.getMessage("access", null, Locale.US));
+        return mapper.projectsToDtos(user.getProjects());
     }
 
     @Override
     @Transactional
     public void deleteProject(Long id, User loggedUser) {
         Project project = getById(id);
-        if(!loggedUser.getUsername().equals(project.getUser().getUsername()))
-            throw new Forbidden(message.getMessage("access", null, Locale.US));
+        validAccess(project,loggedUser);
         repository.deleteById(id);
     }
 
     @Override
-    public Page<Project> getProjectPage(Integer numberPage, Pageable pageable, Long userId) {
-        this.getAllProjectsByUserId(userId);
+    public void validAccess(Project project,User loggedUser){
+        if(project.getUsers()
+                .stream()
+                .filter((u) -> u.getUsername().equals(loggedUser.getUsername()))
+                .collect(Collectors.toList())
+                .isEmpty())
+            throw new Forbidden(message.getMessage("access", null, Locale.US));
+    }
+
+    @Override
+    @Transactional
+    public void addCollaborators(Long id, String username) {
+        User user = userService.getByUsername(username);
+        Project project = getById(id);
+        user.getProjects().add(project);
+        project.getUsers().add(user);
+    }
+
+    @Override
+    public Page<Project> getProjectPage(Integer numberPage, Pageable pageable, Long userId, User loggedUser) {
+        this.getAllProjectsByUserId(userId, loggedUser);
 
         if(numberPage<0){
             throw new BadRequest(message.getMessage("page.invalid", null, Locale.US));
@@ -100,8 +118,8 @@ public class ProjectService implements IProjectService {
     }
 
     @Override
-    public Map<String, Object> responseProjectPage(Integer numberPage, Pageable pageable, Long userId) {
-        Page<Project> projectPage = this.getProjectPage(numberPage, pageable, userId);
+    public Map<String, Object> responseProjectPage(Integer numberPage, Pageable pageable, Long userId, User loggedUser) {
+        Page<Project> projectPage = this.getProjectPage(numberPage, pageable, userId, loggedUser);
         List<Project> projects = projectPage.getContent();
         List<ProjectDto> projectDtos = mapper.projectsToDtos(projects);
 

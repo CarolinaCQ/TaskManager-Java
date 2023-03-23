@@ -21,6 +21,7 @@ public interface ITaskService {
     List<TaskGetDto> getAllTasksByProjectId(Long projectId);
     List<TaskGetDto> getAllTasksByConditionId(Long conditionId);
     void deleteTask(Long id, User loggedUser);
+    void validAccess(Task task, User loggedUser);
     Page<Task> getTaskPage(Integer numberPage, Pageable pageable, Long projectId);
     Map<String, Object> responseTaskPage(Integer numberPage, Pageable pageable, Long projectId);
     Page<Task> getTaskPageByCondition(Integer numberPage, Pageable pageable, Long conditionId);

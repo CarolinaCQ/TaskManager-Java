@@ -27,6 +27,7 @@ import java.net.URI;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.project.demo.util.Contants.Page.*;
 
@@ -53,9 +54,7 @@ public class TaskService implements ITaskService {
         Condition condition = conditionService.getById(1L);
         task.setCondition(condition);
 
-
-        if(!loggedUser.getUsername().equals(project.getUser().getUsername()))
-            throw new Forbidden(message.getMessage("access", null, Locale.US));
+        projectService.validAccess(project,loggedUser);
 
         Task savedTask = repository.save(task);
 
@@ -77,8 +76,7 @@ public class TaskService implements ITaskService {
     @Transactional
     public TaskGetDto updateTask(TaskPostDto dto, Long id, User loggedUser) {
         Task task = getById(id);
-        if(!loggedUser.getUsername().equals(task.getProject().getUser().getUsername()))
-            throw new Forbidden(message.getMessage("access", null, Locale.US));
+        validAccess(task,loggedUser);
         Task savedTask = repository.save(mapper.updateTaskFromDto(dto, task));
         savedTask.setDuration(durationTask(task));
         return mapper.taskToDto(savedTask);
@@ -113,9 +111,18 @@ public class TaskService implements ITaskService {
     @Transactional
     public void deleteTask(Long id, User loggedUser) {
         Task task = getById(id);
-        if(!loggedUser.getUsername().equals(task.getProject().getUser().getUsername()))
-            throw new Forbidden(message.getMessage("access", null, Locale.US));
+        validAccess(task,loggedUser);
         repository.deleteById(id);
+    }
+
+    @Override
+    public void validAccess(Task task, User loggedUser){
+        if(task.getProject().getUsers()
+                .stream()
+                .filter((u) -> u.getUsername().equals(loggedUser.getUsername()))
+                .collect(Collectors.toList())
+                .isEmpty())
+            throw new Forbidden(message.getMessage("access", null, Locale.US));
     }
 
     @Override

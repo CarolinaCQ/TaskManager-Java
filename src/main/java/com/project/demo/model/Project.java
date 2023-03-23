@@ -11,9 +11,10 @@ import org.hibernate.annotations.Where;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
-import static javax.persistence.FetchType.EAGER;
+import static javax.persistence.FetchType.*;
 import static javax.persistence.GenerationType.IDENTITY;
 
 @Entity
@@ -51,8 +52,9 @@ public class Project {
     @JsonIgnoreProperties("project")
     private List<Task> tasks;
 
-    @ManyToOne
+    @ManyToMany(mappedBy = "projects")
     @JsonIgnoreProperties("projects")
-    private User user;
+    //Todo: find a better solution
+    private List<User> users = new ArrayList<>();
 
 }

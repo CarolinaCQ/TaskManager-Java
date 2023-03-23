@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.net.URI;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.project.demo.util.Contants.Page.*;
 
@@ -38,8 +39,7 @@ public class SubtaskService implements ISubtaskService {
     public SubtaskGetDto createSubtask(SubtaskPostDto dto, User loggedUser) {
         Subtask subtask = mapper.dtoToSubtask(dto);
         subtask.setTask(taskRepository.findById(dto.getIdTask()).get());
-        if(!loggedUser.getUsername().equals(subtask.getTask().getProject().getUser().getUsername()))
-            throw new Forbidden(message.getMessage("access",null,Locale.US));
+        validAccess(subtask,loggedUser);
         Subtask savedSubtask = repository.save(subtask);
         subtask.getTask().getSubtasks().add(savedSubtask);
         return mapper.subtaskToDto(savedSubtask);
@@ -49,8 +49,7 @@ public class SubtaskService implements ISubtaskService {
     @Transactional
     public SubtaskGetDto updateSubtask(SubtaskPostDto dto, Long id, User loggedUser) {
         Subtask subtask = getById(id);
-        if(!loggedUser.getUsername().equals(subtask.getTask().getProject().getUser().getUsername()))
-            throw new Forbidden(message.getMessage("access",null,Locale.US));
+        validAccess(subtask,loggedUser);
         Subtask savedSubtask = repository.save(mapper.updateSubtaskFromDto(dto, subtask));
         return mapper.subtaskToDto(savedSubtask);
     }
@@ -79,9 +78,18 @@ public class SubtaskService implements ISubtaskService {
     @Transactional
     public void deleteSubtask(Long id, User loggedUser) {
         Subtask subtask = getById(id);
-        if(!loggedUser.getUsername().equals(subtask.getTask().getProject().getUser().getUsername()))
-            throw new Forbidden(message.getMessage("access",null,Locale.US));
+        validAccess(subtask,loggedUser);
         repository.deleteById(id);
+    }
+
+    @Override
+    public void validAccess(Subtask subtask, User loggedUser) {
+        if(subtask.getTask().getProject().getUsers()
+                .stream()
+                .filter((u) -> u.getUsername().equals(loggedUser.getUsername()))
+                .collect(Collectors.toList())
+                .isEmpty())
+            throw new Forbidden(message.getMessage("access", null, Locale.US));
     }
 
     @Override
