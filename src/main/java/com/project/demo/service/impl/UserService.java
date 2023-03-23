@@ -22,12 +22,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.*;
 
 import static com.project.demo.util.Contants.Roles.ROLE_ADMIN;
 import static com.project.demo.util.Contants.Roles.ROLE_USER;
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
 @Service
 @RequiredArgsConstructor
@@ -97,7 +95,13 @@ public class UserService implements IUserService, UserDetailsService {
     @Override
     public User getById(Long id) {
         return repository.findById(id).orElseThrow(() -> new BadRequest(
-                message.getMessage("user.notFound", null, Locale.US)));
+                message.getMessage("user.notFound", new String[] {"id"}, Locale.US)));
+    }
+
+    @Override
+    public User getByUsername(String username) {
+        return repository.findByUsername(username).orElseThrow(() -> new BadRequest(
+                message.getMessage("user.notFound", new String[] {"username"}, Locale.US)));
     }
 
     @Override

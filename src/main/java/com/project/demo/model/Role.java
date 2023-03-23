@@ -9,6 +9,7 @@ import org.springframework.security.core.GrantedAuthority;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.List;
 
 import static javax.persistence.FetchType.EAGER;
@@ -37,9 +38,10 @@ public class Role implements GrantedAuthority {
     @Column(name="deleted")
     private Boolean deleted = Boolean.FALSE;
 
-    @ManyToMany(mappedBy = "roles", fetch = EAGER)
+    @ManyToMany(mappedBy = "roles")
     @JsonIgnoreProperties("roles")
-    private List<User> users;
+    //Todo: find a better solution
+    private List<User> users = new ArrayList<>();
 
     @Override
     public String getAuthority() {

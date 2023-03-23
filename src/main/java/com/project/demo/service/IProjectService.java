@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 public interface IProjectService {
 
@@ -17,9 +18,11 @@ public interface IProjectService {
     ProjectDto updateProject(ProjectDto dto, Long id, User loggedUser);
     Project getById(Long id);
     ProjectDto getProjectById(Long id);
-    List<ProjectDto> getAllProjectsByUserId(Long userId);
+    List<ProjectDto> getAllProjectsByUserId(Long userId, User loggedUser);
     void deleteProject(Long id, User loggedUser);
-    Page<Project> getProjectPage(Integer numberPage, Pageable pageable, Long userId);
-    Map<String, Object> responseProjectPage(Integer numberPage, Pageable pageable, Long userId);
+    void addCollaborators(Long id, String username);
+    void validAccess(Project project, User loggedUser);
+    Page<Project> getProjectPage(Integer numberPage, Pageable pageable, Long userId, User loggedUser);
+    Map<String, Object> responseProjectPage(Integer numberPage, Pageable pageable, Long userId, User loggedUser);
 
 }

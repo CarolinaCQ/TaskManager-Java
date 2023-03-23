@@ -22,6 +22,7 @@ public interface ISubtaskService {
     SubtaskGetDto getSubtaskById(Long id);
     List<SubtaskGetDto> getAllSubtasksByTaskId(Long taskId);
     void deleteSubtask(Long id, User loggedUser);
+    void validAccess(Subtask subtask, User loggedUser);
     Page<Subtask> getSubtaskPage(Integer numberPage, Pageable pageable, Long taskId);
     Map<String, Object> responseSubtaskPage(Integer numberPage, Pageable pageable, Long taskId);
 

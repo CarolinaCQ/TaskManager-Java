@@ -16,37 +16,50 @@ import javax.validation.Valid;
 import java.util.Map;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("projects")
 public class ProjectController implements IProjectController {
 
-    @Autowired
-    private IProjectService service;
+    private final IProjectService service;
 
     @GetMapping("/{id}")
+    @Override
     public ResponseEntity<ProjectDto> getProjectById(@PathVariable Long id){
         ProjectDto project = service.getProjectById(id);
         return ResponseEntity.status(HttpStatus.OK).body(project);
     }
 
     @GetMapping("/page")
-    public ResponseEntity<Map<String,Object>> pageProjects(@RequestParam Integer numberPage, @RequestParam Long id, Pageable pageable){
-        Map<String,Object> projects = service.responseProjectPage(numberPage,pageable,id);
+    @Override
+    public ResponseEntity<Map<String,Object>> pageProjects(@RequestParam Integer numberPage, @RequestParam Long id, Pageable pageable, @AuthenticationPrincipal User loggedUser){
+        Map<String,Object> projects = service.responseProjectPage(numberPage,pageable,id,loggedUser);
         return ResponseEntity.status(HttpStatus.OK).body(projects);
     }
 
     @PostMapping
+    @Override
     public ResponseEntity<ProjectDto> createProject(@RequestBody @Valid ProjectDto dto, @AuthenticationPrincipal User loggedUser){
         ProjectDto project = service.createProject(dto, loggedUser);
         return ResponseEntity.status(HttpStatus.CREATED).body(project);
     }
 
+    @PostMapping("/add-collaborator/{id}")
+    @Override
+    public ResponseEntity<Void> addCollaborators(@PathVariable Long id, @RequestParam String username) {
+        service.addCollaborators(id,username);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+
     @PatchMapping("/{id}")
+    @Override
     public ResponseEntity<ProjectDto> updateProject(@RequestBody @Valid ProjectDto dto, @PathVariable Long id, @AuthenticationPrincipal User loggedUser){
         ProjectDto project = service.updateProject(dto, id, loggedUser);
         return ResponseEntity.status(HttpStatus.OK).body(project);
     }
 
     @DeleteMapping("/{id}")
+    @Override
     public ResponseEntity<Void> deleteProject(@PathVariable Long id, @AuthenticationPrincipal User loggedUser){
         service.deleteProject(id, loggedUser);
         return ResponseEntity.status(HttpStatus.OK).build();

@@ -13,12 +13,10 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static javax.persistence.FetchType.EAGER;
+import static javax.persistence.FetchType.LAZY;
 import static javax.persistence.GenerationType.IDENTITY;
 
 @Entity
@@ -53,17 +51,21 @@ public class User implements UserDetails{
     @Column(name = "deleted")
     private Boolean deleted = Boolean.FALSE;
 
-    @ManyToMany(fetch =
-            FetchType.EAGER,
-            cascade = CascadeType.PERSIST)
+    @ManyToMany
     @JoinTable(name = "user_role",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))
-    private Set<Role> roles;
+    @JsonIgnoreProperties("users")
+    //Todo: find a better solution
+    private Set<Role> roles = new HashSet<>();
 
-    @OneToMany(mappedBy = "user", fetch = EAGER)
-    @JsonIgnoreProperties("user")
-    private List<Project> projects;
+    @ManyToMany
+    @JoinTable(name = "user_project",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "project_id"))
+    @JsonIgnoreProperties("users")
+    //Todo: find a better solution
+    private List<Project> projects = new ArrayList<>();
 
     @Override
     public String getUsername(){return username;}

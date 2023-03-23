@@ -13,6 +13,7 @@ public interface IUserService {
     LoginResponseDto loginUser(LoginRequestDto dto);
     UserGetDto updateUser(UserPostUpdateDto dto, Long id, User loggedUser);
     User getById(Long id);
+    User getByUsername(String username);
     UserGetDto getUserById(Long id);
     List<UserGetDto> getAllUsers();
     void deleteUser(Long id, User loggedUser);

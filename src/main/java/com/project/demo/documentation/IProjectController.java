@@ -40,7 +40,7 @@ public interface IProjectController {
             @ApiResponse(responseCode = STATUS_BAD_REQUEST, description = INVALID_DATA, content = {@Content}),
             @ApiResponse(responseCode = STATUS_FORBIDDEN, description = NO_AUTHORIZATION, content = {@Content})
     })
-    ResponseEntity<Map<String,Object>> pageProjects(@Parameter(name = PARAMETER_PROJECT_PAGE) @RequestParam Integer numberPage,@Parameter(name = PARAMETER_ID) @RequestParam Long id, Pageable pageable);
+    ResponseEntity<Map<String,Object>> pageProjects(@Parameter(name = PARAMETER_PROJECT_PAGE) @RequestParam Integer numberPage,@Parameter(name = PARAMETER_ID) @RequestParam Long id, Pageable pageable, @AuthenticationPrincipal User loggedUser);
 
     @Operation(summary = SUMARY_ADD, description = DESCRIPTION_ADD)
     @ApiResponses(value = {
@@ -51,6 +51,16 @@ public interface IProjectController {
             @ApiResponse(responseCode = STATUS_INTERNAL_SERVER_ERROR, description = ERROR_SERVER, content = {@Content})
     })
     ResponseEntity<ProjectDto> createProject(@Parameter(name = PARAMETER_PROJECT_ADD) @RequestBody @Valid ProjectDto dto, @AuthenticationPrincipal User loggedUser);
+
+    @Operation(summary = SUMARY_ADD_COLLABORATOR, description = DESCRIPTION_ADD_COLLABORATOR)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = STATUS_CREATED, description = SUCCESS, content = {
+                    @Content()}),
+            @ApiResponse(responseCode = STATUS_BAD_REQUEST, description = INVALID_DATA, content = {@Content}),
+            @ApiResponse(responseCode = STATUS_FORBIDDEN, description = NO_AUTHORIZATION, content = {@Content}),
+            @ApiResponse(responseCode = STATUS_INTERNAL_SERVER_ERROR, description = ERROR_SERVER, content = {@Content})
+    })
+    ResponseEntity<Void> addCollaborators(@Parameter(name = PARAMETER_ID) @PathVariable Long id, @Parameter(name = PARAMETER_USERNAME) @RequestParam String username);
 
     @Operation(summary = SUMARY_UPDATE, description = DESCRIPTION_UPDATE)
     @ApiResponses(value = {
