@@ -5,6 +5,7 @@ import com.project.demo.dto.TaskGetDto;
 import com.project.demo.dto.TaskPostDto;
 import com.project.demo.model.User;
 import com.project.demo.service.ITaskService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -17,10 +18,10 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("tasks")
+@RequiredArgsConstructor
 public class TaskController implements ITaskController {
 
-    @Autowired
-    private ITaskService service;
+    private final ITaskService service;
 
     @GetMapping("/{id}")
     public ResponseEntity<TaskGetDto> getTaskById(@PathVariable Long id){

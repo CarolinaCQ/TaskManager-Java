@@ -38,7 +38,7 @@ public class ProjectController implements IProjectController {
 
     @PostMapping
     @Override
-    public ResponseEntity<ProjectDto> createProject(@RequestBody @Valid ProjectDto dto, @AuthenticationPrincipal User loggedUser){
+    public ResponseEntity<ProjectDto> createProject (@RequestBody @Valid ProjectDto dto, @AuthenticationPrincipal User loggedUser){
         ProjectDto project = service.createProject(dto, loggedUser);
         return ResponseEntity.status(HttpStatus.CREATED).body(project);
     }

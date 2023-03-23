@@ -28,7 +28,7 @@ public interface IConditionController {
             @ApiResponse(responseCode = STATUS_BAD_REQUEST, description = INVALID_DATA, content = {@Content}),
             @ApiResponse(responseCode = STATUS_FORBIDDEN, description = NO_AUTHORIZATION, content = {@Content})
     })
-    ResponseEntity<ConditionDto> geConditionyId(@Parameter(name = PARAMETER_ID) @PathVariable Long id);
+    ResponseEntity<ConditionDto> geConditionyId(@Parameter(name = PARAMETER_ID) Long id);
 
     @Operation(summary = SUMARY_GET_ALL, description = DESCRIPTION_GET_ALL)
     @ApiResponses(value = {
@@ -46,7 +46,7 @@ public interface IConditionController {
             @ApiResponse(responseCode = STATUS_FORBIDDEN, description = NO_AUTHORIZATION, content = {@Content}),
             @ApiResponse(responseCode = STATUS_INTERNAL_SERVER_ERROR, description = ERROR_SERVER, content = {@Content})
     })
-    ResponseEntity<ConditionDto> createCondition(@Parameter(name = PARAMETER_CONDITION_ADD) @RequestBody @Valid ConditionDto dto);
+    ResponseEntity<ConditionDto> createCondition(@Parameter(name = PARAMETER_CONDITION_ADD) ConditionDto dto);
 
     @Operation(summary = SUMARY_UPDATE, description = DESCRIPTION_UPDATE)
     @ApiResponses(value = {
@@ -57,7 +57,7 @@ public interface IConditionController {
             @ApiResponse(responseCode = STATUS_FORBIDDEN, description = NO_AUTHORIZATION, content = {@Content}),
             @ApiResponse(responseCode = STATUS_INTERNAL_SERVER_ERROR, description = ERROR_SERVER, content = {@Content})
     })
-    ResponseEntity<ConditionDto> updateCondition(@Parameter(name = PARAMETER_CONDITION_UPDATE) @RequestBody @Valid ConditionDto dto, @Parameter(name = PARAMETER_ID) @PathVariable Long id);
+    ResponseEntity<ConditionDto> updateCondition(@Parameter(name = PARAMETER_CONDITION_UPDATE) ConditionDto dto, @Parameter(name = PARAMETER_ID) @PathVariable Long id);
 
     @Operation(summary = SUMARY_DELETE, description = DESCRIPTION_DELETE)
     @ApiResponses(value = {
@@ -65,5 +65,5 @@ public interface IConditionController {
             @ApiResponse(responseCode = STATUS_NOT_FOUND, description = NOT_FOUND_CONDITION, content = {@Content}),
             @ApiResponse(responseCode = STATUS_FORBIDDEN, description = NO_AUTHORIZATION, content = {@Content})
     })
-    ResponseEntity<Void> deleteCondition(@Parameter(name = PARAMETER_ID) @PathVariable Long id);
+    ResponseEntity<Void> deleteCondition(@Parameter(name = PARAMETER_ID) Long id);
 }

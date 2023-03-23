@@ -5,6 +5,7 @@ import com.project.demo.dto.SubtaskGetDto;
 import com.project.demo.dto.SubtaskPostDto;
 import com.project.demo.model.User;
 import com.project.demo.service.ISubtaskService;
+import lombok.RequiredArgsConstructor;
 import org.mapstruct.control.MappingControl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -18,10 +19,10 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("subtasks")
+@RequiredArgsConstructor
 public class SubtaskController implements ISubtaskController {
 
-    @Autowired
-    private ISubtaskService service;
+    private final ISubtaskService service;
 
     @GetMapping("/{id}")
     public ResponseEntity<SubtaskGetDto> getSubtaskById(@PathVariable Long id){

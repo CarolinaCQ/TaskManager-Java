@@ -3,6 +3,7 @@ package com.project.demo.controller;
 import com.project.demo.documentation.IConditionController;
 import com.project.demo.dto.ConditionDto;
 import com.project.demo.service.IConditionService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,10 +14,10 @@ import java.util.List;
 
 @RestController
 @RequestMapping("tasks/conditions")
+@RequiredArgsConstructor
 public class ConditionController implements IConditionController {
 
-    @Autowired
-    private IConditionService service;
+    private final IConditionService service;
 
     @GetMapping("/{id}")
     public ResponseEntity<ConditionDto> geConditionyId(@PathVariable Long id){
