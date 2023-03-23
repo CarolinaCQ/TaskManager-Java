@@ -192,8 +192,9 @@ public class Contants {
         public static final String DESCRIPTION_GET_ID = "This endpoint is used to get a user by Id";
 
         public static final String PARAMETER_ID = "Id of the user";
-        public static final String PARAMETER_CONDITION_ADD = "User to add";
-        public static final String PARAMETER_CONDITION_UPDATE = "User to update";
+        public static final String PARAMETER_USER_ADD = "User to add";
+        public static final String PARAMETER_USER_UPDATE = "User to update";
+        public static final String PARAMETER_USER_LOGIN = "Username and user password to login";
 
     }
 }

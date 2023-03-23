@@ -3,17 +3,13 @@ package com.project.demo.documentation;
 import com.project.demo.dto.*;
 import com.project.demo.model.User;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
 import java.util.List;
 
 import static com.project.demo.util.Contants.UserApi.*;
@@ -30,7 +26,7 @@ public interface IAuthController {
             @ApiResponse(responseCode = STATUS_FORBIDDEN, description = NO_AUTHORIZATION, content = {@Content}),
             @ApiResponse(responseCode = STATUS_INTERNAL_SERVER_ERROR, description = ERROR_SERVER, content = {@Content})
     })
-    ResponseEntity<UserGetDto> registerUser(UserPostDto dto);
+    ResponseEntity<UserGetDto> registerUser(@Parameter(name = PARAMETER_USER_ADD) UserPostDto dto);
 
     @Operation(summary = SUMARY_LOGIN, description = DESCRIPTION_LOGIN)
     @ApiResponses(value = {
@@ -40,7 +36,7 @@ public interface IAuthController {
             @ApiResponse(responseCode = STATUS_BAD_REQUEST, description = INVALID_DATA, content = {@Content}),
             @ApiResponse(responseCode = STATUS_FORBIDDEN, description = NO_AUTHORIZATION, content = {@Content})
     })
-    ResponseEntity<LoginResponseDto> login(LoginRequestDto dto);
+    ResponseEntity<LoginResponseDto> login(@Parameter(name = PARAMETER_USER_LOGIN) LoginRequestDto dto);
 
     @Operation(summary = SUMARY_GET_ID, description = DESCRIPTION_GET_ID)
     @ApiResponses(value = {
@@ -50,7 +46,7 @@ public interface IAuthController {
             @ApiResponse(responseCode = STATUS_BAD_REQUEST, description = INVALID_DATA, content = {@Content}),
             @ApiResponse(responseCode = STATUS_FORBIDDEN, description = NO_AUTHORIZATION, content = {@Content})
     })
-    ResponseEntity<UserGetDto> getUserById(Long id);
+    ResponseEntity<UserGetDto> getUserById(@Parameter(name = PARAMETER_ID) Long id);
 
     @Operation(summary = SUMARY_GET_ALL, description = DESCRIPTION_GET_ALL)
     @ApiResponses(value = {
@@ -69,7 +65,7 @@ public interface IAuthController {
             @ApiResponse(responseCode = STATUS_FORBIDDEN, description = NO_AUTHORIZATION, content = {@Content}),
             @ApiResponse(responseCode = STATUS_INTERNAL_SERVER_ERROR, description = ERROR_SERVER, content = {@Content})
     })
-    ResponseEntity<UserGetDto> updateUser(UserPostUpdateDto dto, Long id, User loggedUser);
+    ResponseEntity<UserGetDto> updateUser(@Parameter(name = PARAMETER_USER_UPDATE) UserPostUpdateDto dto, @Parameter(name = PARAMETER_ID) Long id, User loggedUser);
 
     @Operation(summary = SUMARY_DELETE, description = DESCRIPTION_DELETE)
     @ApiResponses(value = {
@@ -77,5 +73,5 @@ public interface IAuthController {
             @ApiResponse(responseCode = STATUS_NOT_FOUND, description = NOT_FOUND_USER, content = {@Content}),
             @ApiResponse(responseCode = STATUS_FORBIDDEN, description = NO_AUTHORIZATION, content = {@Content})
     })
-    ResponseEntity<Void> deleteUser(Long id, User loggedUser);
+    ResponseEntity<Void> deleteUser(@Parameter(name = PARAMETER_ID) Long id, User loggedUser);
 }
