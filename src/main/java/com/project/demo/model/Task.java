@@ -12,6 +12,7 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import static javax.persistence.FetchType.EAGER;
@@ -65,7 +66,7 @@ public class Task {
     @JsonIgnoreProperties("tasks")
     private Project project;
 
-    @OneToMany(mappedBy = "task", fetch = EAGER)
+    @OneToMany(mappedBy = "task")
     @JsonIgnoreProperties("task")
-    private List<Subtask> subtasks;
+    private List<Subtask> subtasks = new ArrayList<>();
 }

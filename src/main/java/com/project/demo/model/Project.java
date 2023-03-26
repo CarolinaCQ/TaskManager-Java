@@ -48,13 +48,12 @@ public class Project {
     @Column(name = "deleted")
     private Boolean deleted = Boolean.FALSE;
 
-    @OneToMany(mappedBy = "project", fetch = EAGER)
+    @OneToMany(mappedBy = "project")
     @JsonIgnoreProperties("project")
-    private List<Task> tasks;
+    private List<Task> tasks = new ArrayList<>();
 
     @ManyToMany(mappedBy = "projects")
     @JsonIgnoreProperties("projects")
-    //Todo: find a better solution
     private List<User> users = new ArrayList<>();
 
 }
