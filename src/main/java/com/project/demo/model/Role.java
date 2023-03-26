@@ -40,7 +40,6 @@ public class Role implements GrantedAuthority {
 
     @ManyToMany(mappedBy = "roles")
     @JsonIgnoreProperties("roles")
-    //Todo: find a better solution
     private List<User> users = new ArrayList<>();
 
     @Override

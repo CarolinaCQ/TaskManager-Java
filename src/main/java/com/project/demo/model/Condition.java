@@ -9,6 +9,7 @@ import org.hibernate.annotations.Where;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static javax.persistence.FetchType.EAGER;
@@ -37,8 +38,8 @@ public class Condition {
     @Column(name="deleted")
     private Boolean deleted = Boolean.FALSE;
 
-    @OneToMany(mappedBy = "condition", fetch = EAGER)
+    @OneToMany(mappedBy = "condition")
     @JsonIgnoreProperties("condition")
-    private List<Task> tasks;
+    private List<Task> tasks = new ArrayList<>();
 
 }

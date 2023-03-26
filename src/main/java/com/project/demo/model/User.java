@@ -8,15 +8,12 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.*;
 
-import static javax.persistence.FetchType.EAGER;
-import static javax.persistence.FetchType.LAZY;
 import static javax.persistence.GenerationType.IDENTITY;
 
 @Entity
@@ -56,7 +53,6 @@ public class User implements UserDetails{
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     @JsonIgnoreProperties("users")
-    //Todo: find a better solution
     private Set<Role> roles = new HashSet<>();
 
     @ManyToMany
@@ -64,7 +60,6 @@ public class User implements UserDetails{
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "project_id"))
     @JsonIgnoreProperties("users")
-    //Todo: find a better solution
     private List<Project> projects = new ArrayList<>();
 
     @Override
